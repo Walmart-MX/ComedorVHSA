@@ -1,5 +1,12 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
+
+// Usamos el bundle UMD oficial de supabase-js (cargado como <script> clasico
+// en index.html, ver window.supabase) en vez de importarlo desde esm.sh:
+// esm.sh reparte el paquete en varios sub-modulos (auth-js, postgrest-js,
+// storage-js...) y en la practica eso rompio el apikey header por defecto
+// (la API respondia 401 'No API key found in request'). El bundle UMD de
+// jsDelivr es un solo archivo auto-contenido, sin ese problema.
+const { createClient } = window.supabase;
 
 // Mientras config.js tenga placeholders (proyecto Supabase aun no enlazado),
 // evitamos que createClient() tire toda la app - en vez de eso mostramos un
