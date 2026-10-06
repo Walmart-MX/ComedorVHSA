@@ -1,9 +1,14 @@
 import { initAsociado } from './asociado.js';
 import { initAuth } from './auth.js';
 import { initQR } from './qr.js';
+import { isSupabaseConfigured } from './supabase-client.js';
 import { renderDashboard } from './admin-dashboard.js';
 import { initAdminTable, renderTabla } from './admin-table.js';
 import { renderTendencias } from './admin-trends.js';
+
+if (!isSupabaseConfigured) {
+  document.getElementById('backend-warning')?.classList.remove('hidden');
+}
 
 initAsociado();
 initQR();

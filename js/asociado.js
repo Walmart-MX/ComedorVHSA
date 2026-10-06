@@ -1,4 +1,4 @@
-import { supabase } from './supabase-client.js';
+import { supabase, isSupabaseConfigured } from './supabase-client.js';
 import { CAT_NAMES, PRIORIDADES, PRI_LABELS, PRI_COLOR_VAR } from './catalog.js';
 
 let currentCat = null;
@@ -104,6 +104,10 @@ async function subirFoto() {
 }
 
 async function enviarReporte() {
+  if (!isSupabaseConfigured) {
+    alert('El backend todavia no esta configurado. Intenta mas tarde.');
+    return;
+  }
   const numero_empleado = document.getElementById('f-empleado').value.trim();
   const cedis = document.getElementById('f-cedis').value;
   const comedor = document.getElementById('f-comedor').value;

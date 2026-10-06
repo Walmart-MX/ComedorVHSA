@@ -1,4 +1,4 @@
-import { supabase } from './supabase-client.js';
+import { supabase, isSupabaseConfigured } from './supabase-client.js';
 import {
   CAT_NAMES, CEDIS_NAMES, PRI_LABELS, PRI_BADGE,
   STATUS_LABELS, STATUS_BADGE, escapeHtml
@@ -73,6 +73,10 @@ async function openModal(id) {
 
 async function cargarHistorial(reporteId) {
   const box = document.getElementById('m-historial');
+  if (!isSupabaseConfigured) {
+    box.innerHTML = '';
+    return;
+  }
   box.innerHTML = '<p style="font-size:.78rem;color:var(--text2);">Cargando...</p>';
   const { data, error } = await supabase
     .from('reportes_historial')
@@ -103,6 +107,7 @@ function cambiarEstatusPendiente() { /* el valor queda en el <select>, se persis
 
 async function guardarAccion() {
   if (editingId === null) return;
+  if (!isSupabaseConfigured) return;
   const nuevoEstatus = document.getElementById('m-status-sel').value;
   const payload = {
     estatus: nuevoEstatus,

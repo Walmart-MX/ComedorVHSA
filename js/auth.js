@@ -1,4 +1,4 @@
-import { supabase } from './supabase-client.js';
+import { supabase, isSupabaseConfigured } from './supabase-client.js';
 
 /**
  * Maneja login/logout del panel admin usando Supabase Auth
@@ -36,6 +36,11 @@ export function initAuth({ onLogin } = {}) {
   }
 
   async function handleLogin() {
+    if (!isSupabaseConfigured) {
+      errorBox.textContent = 'El backend todavia no esta configurado (falta js/config.js).';
+      errorBox.style.display = 'block';
+      return;
+    }
     const email = document.getElementById('l-user').value.trim();
     const password = document.getElementById('l-pass').value;
     errorBox.style.display = 'none';
@@ -57,11 +62,13 @@ export function initAuth({ onLogin } = {}) {
     showAsociado();
   }
 
-  // Si ya hay sesión activa (recarga de página), entrar directo al panel.
-  supabase.auth.getSession().then(({ data }) => {
-    if (data.session) {
-      showAdminPanel();
-      onLogin?.();
-    }
-  });
+  // Si ya hay sesion activa (recarga de pagina), entrar directo al panel.
+  if (isSupabaseConfigured) {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        showAdminPanel();
+        onLogin?.();
+      }
+    });
+  }
 }

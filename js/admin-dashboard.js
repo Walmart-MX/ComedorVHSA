@@ -1,4 +1,4 @@
-import { supabase } from './supabase-client.js';
+import { supabase, isSupabaseConfigured } from './supabase-client.js';
 import { CAT_NAMES, CEDIS_NAMES, escapeHtml } from './catalog.js';
 
 let cachedReportes = [];
@@ -8,6 +8,10 @@ export function getCachedReportes() {
 }
 
 export async function cargarReportes() {
+  if (!isSupabaseConfigured) {
+    cachedReportes = [];
+    return cachedReportes;
+  }
   const cedisF = document.getElementById('admin-cedis-filter')?.value || 'todos';
   let query = supabase.from('reportes').select('*').order('creado_en', { ascending: false });
   if (cedisF !== 'todos') query = query.eq('cedis', cedisF);
