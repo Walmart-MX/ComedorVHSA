@@ -4,5 +4,5 @@
    el acceso real está controlado por Row Level Security (RLS)
    en la base de datos, no por mantener esto en secreto.
 ═══════════════════════════════════════════ */
-export const SUPABASE_URL = 'REPLACE_WITH_PROJECT_URL';
-export const SUPABASE_ANON_KEY = 'REPLACE_WITH_ANON_KEY';
+export const SUPABASE_URL = 'https://switfyozjhfceqysvcji.supabase.co';
+export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3aXRmeW96amhmY2VxeXN2Y2ppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMDAxODQsImV4cCI6MjEwNjg3NjE4NH0.0VlMLBYw7zSHOiSuECXp3JmoeRMcAwE90p198f8VfJg';
