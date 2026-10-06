@@ -219,7 +219,11 @@ button,select,input,textarea{font-family:inherit;}
 /* ═══════════════════════════════════════════
    PANEL ADMIN
 ═══════════════════════════════════════════ */
-#app-admin{display:none;}
+/* app-admin: visibilidad controlada 100% por la clase .hidden (ver abajo).
+   Antes habia aqui '#app-admin{display:none;}' -- un selector por ID le
+   gana en especificidad a .hidden en cuanto el JS quita esa clase (sin
+   !important), asi que el panel JAMAS se volvia a mostrar tras el login.
+   Eso causaba la pantalla en blanco reportada. */
 
 /* Login */
 .login-wrap{
