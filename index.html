@@ -1,0 +1,588 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Reportes Comedor - Walmart CEDIS</title>
+<link rel="stylesheet" href="css/styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════
+     APP ASOCIADO
+═══════════════════════════════════ -->
+<div id="app-asociado">
+
+  <!-- PASO 1: CATEGORÍA -->
+  <div id="step-1">
+    <div class="aso-header">
+      <div class="aso-logo">🍽️</div>
+      <h1>Reporte de Oportunidades</h1>
+      <p>Comedor — CEDIS Walmart Villahermosa</p>
+    </div>
+
+    <div style="padding:20px 16px 0;">
+      <div class="intro-card">
+        <p>¿Detectaste alguna oportunidad en el servicio de comedor? Ayúdanos a identificarla y mejorar la experiencia de todos.</p>
+      </div>
+
+      <div class="step-bar">
+        <div class="step-dot active" id="sd1">1</div>
+        <div class="step-line" id="sl1"></div>
+        <div class="step-dot" id="sd2">2</div>
+        <div class="step-line" id="sl2"></div>
+        <div class="step-dot" id="sd3">✓</div>
+        <span class="step-label">Categoría → Datos → Listo</span>
+      </div>
+
+      <div class="step-title">Selecciona la categoría</div>
+      <div class="cat-grid">
+        <div class="cat-card" role="button" tabindex="0" data-cat="temperatura">
+          <span class="cat-name">Temperatura</span>
+          <span class="cat-desc">Alimento muy frío, caliente o fuera de lo esperado</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="calidad">
+          <span class="cat-name">Calidad y frescura</span>
+          <span class="cat-desc">Alimento en mal estado o sin frescura</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="coccion">
+          <span class="cat-name">Cocción</span>
+          <span class="cat-desc">Alimento crudo, quemado o mal preparado</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="porcion">
+          <span class="cat-name">Porción</span>
+          <span class="cat-desc">Cantidad insuficiente o excesiva servida</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="objeto">
+          <span class="cat-name">Objeto extraño</span>
+          <span class="cat-desc">Materia u objeto extraño en los alimentos</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="limpieza">
+          <span class="cat-name">Limpieza</span>
+          <span class="cat-desc">Instalaciones o utensilios sin limpiar</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="espera">
+          <span class="cat-name">Tiempo de espera</span>
+          <span class="cat-desc">Espera prolongada para ser atendido</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="atencion">
+          <span class="cat-name">Atención</span>
+          <span class="cat-desc">Mal servicio o trato del personal</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="higiene">
+          <span class="cat-name">Higiene</span>
+          <span class="cat-desc">Personal sin equipo de protección adecuado</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="otra">
+          <span class="cat-name">Otra incidencia</span>
+          <span class="cat-desc">Cualquier otra oportunidad de mejora</span>
+        </div>
+      </div>
+
+      <div style="margin-bottom:24px;">
+        <button class="btn-primary" id="btn-step2" style="opacity:.5;pointer-events:none;">
+          Continuar →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 2: FORMULARIO -->
+  <div id="step-2" class="hidden">
+    <div class="aso-header">
+      <div class="aso-logo">🍽️</div>
+      <h1>Reporte de Oportunidades</h1>
+      <p id="s2-cat-label">Categoría seleccionada</p>
+    </div>
+
+    <div style="padding:20px 16px 0;">
+      <div class="step-bar">
+        <div class="step-dot done" id="sd1b">✓</div>
+        <div class="step-line done" id="sl1b"></div>
+        <div class="step-dot active" id="sd2b">2</div>
+        <div class="step-line" id="sl2b"></div>
+        <div class="step-dot" id="sd3b">3</div>
+        <span class="step-label">Categoría → Datos → Listo</span>
+      </div>
+
+      <div class="step-section">
+        <!-- No. Empleado -->
+        <div class="form-field">
+          <label class="form-label">No. de Asociado <span>*</span></label>
+          <input class="form-input" id="f-empleado" type="text" placeholder="Ej. 8155457" maxlength="15">
+        </div>
+        <!-- Nombre -->
+        <div class="form-field">
+          <label class="form-label">Nombre (opcional)</label>
+          <input class="form-input" id="f-nombre" type="text" placeholder="Tu nombre">
+        </div>
+        <!-- CEDIS -->
+        <div class="form-field">
+          <label class="form-label">CEDIS <span>*</span></label>
+          <select class="form-select" id="f-cedis">
+            <option value="">— Selecciona —</option>
+            <option value="cedis-villahermosa">CEDIS Villahermosa</option>
+            <option value="cedis-merida">CEDIS Mérida</option>
+            <option value="cedis-queretaro">CEDIS Querétaro</option>
+            <option value="cedis-campeche">CEDIS Campeche</option>
+          </select>
+        </div>
+        <!-- Comedor -->
+        <div class="form-field">
+          <label class="form-label">Comedor <span>*</span></label>
+          <select class="form-select" id="f-comedor">
+            <option value="">— Selecciona —</option>
+            <option value="principal">Comedor Principal</option>
+            <option value="secundario">Comedor Secundario</option>
+          </select>
+        </div>
+        <!-- Fecha/Hora auto -->
+        <div class="form-field">
+          <label class="form-label">Fecha y hora</label>
+          <div class="auto-field">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="f-datetime"></span>
+          </div>
+          <div class="form-hint">Capturada automáticamente</div>
+        </div>
+        <!-- Descripción -->
+        <div class="form-field">
+          <label class="form-label">Descripción de la oportunidad <span>*</span></label>
+          <textarea class="form-textarea" id="f-desc" placeholder="Describe con detalle qué ocurrió, dónde y cuándo dentro del comedor..."></textarea>
+        </div>
+        <!-- Foto -->
+        <div class="form-field">
+          <label class="form-label">Evidencia fotográfica (opcional)</label>
+          <div class="photo-area" id="photo-area">
+            <div style="font-size:2rem;">📷</div>
+            <p>Toca para tomar o seleccionar foto</p>
+            <small>JPG, PNG — máx. 5 MB</small>
+          </div>
+          <input type="file" id="f-foto" accept="image/*" capture="environment" style="display:none;">
+          <img id="photo-preview" alt="Vista previa">
+          <button type="button" id="btn-remove-foto" class="btn-secondary hidden" style="margin-top:6px;width:auto;padding:6px 14px;font-size:.75rem;">✕ Quitar foto</button>
+        </div>
+
+        <!-- Prioridad calculada -->
+        <div class="form-field">
+          <label class="form-label">Prioridad del reporte</label>
+          <div class="prioridad-display" id="pri-display">
+            <div class="pri-dot" id="pri-dot" style="background:var(--amber);"></div>
+            <span id="pri-label" style="font-size:.82rem;font-weight:700;">Media</span>
+            <span style="font-size:.72rem;color:var(--text2);margin-left:4px;">— Calculada automáticamente</span>
+          </div>
+        </div>
+
+        <button class="btn-primary" id="btn-enviar-reporte">✅ Enviar reporte</button>
+        <button class="btn-secondary" id="btn-goback">← Cambiar categoría</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRMACIÓN -->
+  <div id="step-confirm" class="hidden">
+    <div class="confirm-wrap">
+      <div class="confirm-icon">✅</div>
+      <h2>Reporte registrado</h2>
+      <p>Gracias por ayudarnos a identificar oportunidades de mejora.</p>
+      <div class="folio-box">
+        <div class="folio-label">Folio de seguimiento</div>
+        <div class="folio-num" id="c-folio">COM-2026-000001</div>
+      </div>
+      <div class="confirm-detail">
+        <div class="confirm-row"><span>Categoría</span><span id="c-cat">—</span></div>
+        <div class="confirm-row"><span>Prioridad</span><span id="c-pri">—</span></div>
+        <div class="confirm-row"><span>Fecha</span><span id="c-fecha">—</span></div>
+        <div class="confirm-row"><span>CEDIS</span><span id="c-cedis">—</span></div>
+        <div class="confirm-row"><span>Comedor</span><span id="c-comedor">—</span></div>
+      </div>
+      <p style="font-size:.75rem;color:var(--text2);max-width:280px;">Guarda tu folio para consultar el estatus de tu reporte con el área de recursos humanos o tu supervisor.</p>
+      <button class="btn-primary" id="btn-nuevo-reporte" style="margin-top:20px;max-width:280px;">+ Nuevo reporte</button>
+    </div>
+  </div>
+
+</div><!-- /app-asociado -->
+
+
+<!-- ═══════════════════════════════════
+     LOGIN ADMIN
+═══════════════════════════════════ -->
+<div id="app-login" class="hidden">
+  <div class="login-wrap">
+    <div class="login-box">
+      <div class="logo">🍽️</div>
+      <h2>Panel Administrativo</h2>
+      <p>Reporte de Oportunidades — Comedor</p>
+      <div class="form-field" style="text-align:left;">
+        <label class="form-label">Correo</label>
+        <input class="form-input" id="l-user" type="email" placeholder="admin@walmart.com" autocomplete="username">
+      </div>
+      <div class="form-field" style="text-align:left;">
+        <label class="form-label">Contraseña</label>
+        <input class="form-input" id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div id="l-error" style="color:var(--red);font-size:.78rem;margin-bottom:10px;display:none;">Usuario o contraseña incorrectos.</div>
+      <button class="btn-primary" id="btn-login">Entrar al panel</button>
+      <button class="btn-secondary" id="btn-show-asociado">← Volver al formulario</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     APP ADMIN
+═══════════════════════════════════ -->
+<div id="app-admin" class="hidden">
+  <div class="admin-header-bar">
+    <h1>🍽️ Reportes Comedor</h1>
+    <div class="right">
+      <select class="admin-cedis-sel" id="admin-cedis-filter">
+        <option value="todos">Todos los CEDIS</option>
+        <option value="cedis-villahermosa">Villahermosa</option>
+        <option value="cedis-merida">Mérida</option>
+        <option value="cedis-queretaro">Querétaro</option>
+        <option value="cedis-campeche">Campeche</option>
+      </select>
+      <button class="btn-logout" id="btn-logout">Salir</button>
+    </div>
+  </div>
+  <div class="admin-nav">
+    <div class="nav-tab active" data-tab="dashboard">Dashboard</div>
+    <div class="nav-tab" data-tab="reportes">Reportes</div>
+    <div class="nav-tab" data-tab="tendencias">Tendencias</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard" class="admin-content">
+    <!-- Alerta de tendencia -->
+    <div class="trend-alert" id="trend-alert">
+      <div class="icon">📈</div>
+      <p><strong>Tendencia detectada</strong>Incremento de reportes de <strong>Temperatura</strong> en las últimas 3 semanas. Se recomienda revisión del equipo de mantenimiento.</p>
+    </div>
+    <!-- KPIs -->
+    <div class="kpi-grid" id="kpi-grid"></div>
+    <!-- Gráficas -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">Reportes por categoría</div>
+        <div class="bar-chart" id="chart-cat"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Reportes por día (últimos 7 días)</div>
+        <div class="bar-chart" id="chart-dias"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Distribución por prioridad</div>
+        <div class="bar-chart" id="chart-pri"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Reportes por CEDIS</div>
+        <div class="bar-chart" id="chart-cedis"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORTES -->
+  <div id="tab-reportes" class="admin-content hidden">
+    <div class="table-filters">
+      <input class="filter-input" type="text" placeholder="Buscar folio..." id="f-search" style="width:130px;">
+      <select class="filter-select" id="f-cat">
+        <option value="">Todas las categorías</option>
+        <option value="temperatura">Temperatura</option>
+        <option value="calidad">Calidad</option>
+        <option value="coccion">Cocción</option>
+        <option value="porcion">Porción</option>
+        <option value="objeto">Objeto extraño</option>
+        <option value="limpieza">Limpieza</option>
+        <option value="espera">Tiempo de espera</option>
+        <option value="atencion">Atención</option>
+        <option value="higiene">Higiene</option>
+        <option value="otra">Otra</option>
+      </select>
+      <select class="filter-select" id="f-pri">
+        <option value="">Todas las prioridades</option>
+        <option value="alta">Alta</option>
+        <option value="media">Media</option>
+        <option value="baja">Baja</option>
+      </select>
+      <select class="filter-select" id="f-status">
+        <option value="">Todos los estatus</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="revision">En revisión</option>
+        <option value="atendido">Atendido</option>
+        <option value="cerrado">Cerrado</option>
+      </select>
+      <button class="btn-export" id="btn-export-csv">⬇️ Exportar CSV</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Folio</th><th>Fecha</th><th>Hora</th>
+            <th>CEDIS</th><th>Comedor</th><th>Categoría</th>
+            <th>Prioridad</th><th>Asociado</th>
+            <th>Descripción</th><th>Estatus</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TENDENCIAS -->
+  <div id="tab-tendencias" class="admin-content hidden">
+    <div class="trend-alert">
+      <div class="icon">🔍</div>
+      <p><strong>Análisis de tendencias — últimas 4 semanas</strong>El sistema detecta incrementos sostenidos en categorías de inocuidad. Revisa el detalle semanal a continuación.</p>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-card" style="grid-column:1/-1;">
+        <div class="chart-title">Evolución semanal por categoría</div>
+        <div class="bar-chart" id="chart-semanas"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Horario con más reportes</div>
+        <div class="bar-chart" id="chart-horario"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Tiempo promedio de atención (días)</div>
+        <div class="bar-chart" id="chart-tiempo"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app-admin -->
+
+<!-- MODAL DETALLE REPORTE -->
+<div class="modal-overlay hidden" id="modal-detalle">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 id="m-folio">COM-2026-000001</h3>
+        <p id="m-fecha">—</p>
+      </div>
+      <button class="btn-close" id="btn-close-modal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-section">
+        <h4>Información general</h4>
+        <div class="detail-row"><span>Categoría</span><span id="m-cat">—</span></div>
+        <div class="detail-row"><span>Prioridad</span><span id="m-pri">—</span></div>
+        <div class="detail-row"><span>CEDIS</span><span id="m-cedis">—</span></div>
+        <div class="detail-row"><span>Comedor</span><span id="m-comedor">—</span></div>
+        <div class="detail-row"><span>Asociado</span><span id="m-asociado">—</span></div>
+        <div class="detail-row"><span>No. Empleado</span><span id="m-empleado">—</span></div>
+        <div class="detail-row"><span>Descripción</span><span id="m-desc">—</span></div>
+      </div>
+      <div class="detail-section">
+        <h4>Estatus y gestión</h4>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;">
+          <label style="font-size:.78rem;font-weight:700;">Estatus:</label>
+          <select class="status-select" id="m-status-sel">
+            <option value="pendiente">Pendiente</option>
+            <option value="revision">En revisión</option>
+            <option value="atendido">Atendido</option>
+            <option value="cerrado">Cerrado</option>
+          </select>
+        </div>
+        <div class="action-form">
+          <label>Responsable</label>
+          <input type="text" id="m-responsable" placeholder="Nombre del responsable">
+          <label>Acción realizada</label>
+          <textarea id="m-accion" placeholder="Describe la acción tomada..." style="min-height:60px;"></textarea>
+          <label>Fecha compromiso</label>
+          <input type="date" id="m-fecha-comp">
+          <button class="btn-save-action" id="btn-guardar-accion">💾 Guardar gestión</button>
+        </div>
+      </div>
+      <div class="detail-section">
+        <h4>Historial</h4>
+        <div id="m-historial"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Botón acceso admin (oculto en esquina) -->
+<div style="position:fixed;bottom:16px;right:16px;z-index:200;" id="btn-admin-wrap">
+  <button id="btn-show-login" style="background:var(--blue-dark);color:white;border:none;border-radius:50%;width:40px;height:40px;font-size:.8rem;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.3);opacity:.6;" title="Admin">⚙️</button>
+  <button id="btn-show-qr" style="background:var(--blue);color:white;border:none;border-radius:50%;width:40px;height:40px;font-size:.8rem;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.3);opacity:.6;margin-top:8px;" title="Ver QR">📱</button>
+</div>
+
+<script type="module" src="js/main.js"></script>
+
+<!-- ═══════════════════════════════════
+     PANEL QR COMEDOR
+═══════════════════════════════════ -->
+<div id="app-qr" class="hidden" style="max-width:500px;margin:0 auto;padding:20px 16px 40px;">
+
+  <div style="background:var(--yellow);border-radius:28px;padding:7px;box-shadow:0 8px 40px rgba(0,48,135,.25);">
+    <div style="background:var(--blue);border-radius:22px;padding:6px;">
+      <div style="background:white;border-radius:18px;overflow:hidden;">
+
+        <!-- Escenario superior -->
+        <div style="background:var(--blue);padding:0;position:relative;height:90px;overflow:hidden;">
+          <svg viewBox="0 0 500 90" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;position:absolute;top:0;left:0;">
+            <rect width="500" height="90" fill="#0071CE"/>
+            <path d="M0 80 Q125 55 250 70 Q375 85 500 60 L500 90 L0 90 Z" fill="#005ea6" opacity="0.6"/>
+            <path d="M0 82 Q125 58 250 73 Q375 88 500 63" stroke="white" stroke-width="2.5" fill="none" stroke-dasharray="14,8" opacity="0.7"/>
+            <!-- Edificios izq -->
+            <rect x="12" y="30" width="12" height="52" fill="#003087"/>
+            <rect x="26" y="42" width="10" height="40" fill="#005ea6"/>
+            <rect x="38" y="35" width="14" height="47" fill="#003087"/>
+            <rect x="14" y="34" width="3" height="3" fill="#FFC220" opacity="0.8"/>
+            <rect x="19" y="34" width="3" height="3" fill="#FFC220" opacity="0.8"/>
+            <rect x="40" y="39" width="3" height="3" fill="#FFC220" opacity="0.8"/>
+            <!-- Árbol izq -->
+            <ellipse cx="75" cy="45" rx="10" ry="13" fill="#003087"/>
+            <rect x="73" y="55" width="4" height="10" fill="#005ea6"/>
+            <!-- Icono comedor central -->
+            <rect x="210" y="15" width="80" height="55" rx="6" fill="#003087"/>
+            <rect x="212" y="17" width="76" height="51" rx="5" fill="#0071CE"/>
+            <!-- Tenedor y cuchillo -->
+            <rect x="237" y="25" width="4" height="30" rx="2" fill="white" opacity="0.9"/>
+            <rect x="245" y="25" width="2" height="10" rx="1" fill="white" opacity="0.7"/>
+            <ellipse cx="246" cy="38" rx="4" ry="7" fill="white" opacity="0.7"/>
+            <rect x="244" y="44" width="4" height="12" rx="1" fill="white" opacity="0.7"/>
+            <rect x="255" y="25" width="4" height="30" rx="2" fill="white" opacity="0.9"/>
+            <!-- Plato -->
+            <ellipse cx="270" cy="40" rx="12" ry="8" fill="white" opacity="0.15"/>
+            <!-- Spark en camión -->
+            <g transform="translate(250,40)">
+              <line x1="0" y1="-10" x2="0" y2="-5" stroke="#FFC220" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="8.7" y1="-5" x2="4.3" y2="-2.5" stroke="#FFC220" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="8.7" y1="5" x2="4.3" y2="2.5" stroke="#FFC220" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="0" y1="10" x2="0" y2="5" stroke="#FFC220" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="-8.7" y1="5" x2="-4.3" y2="2.5" stroke="#FFC220" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="-8.7" y1="-5" x2="-4.3" y2="-2.5" stroke="#FFC220" stroke-width="2.5" stroke-linecap="round"/>
+            </g>
+            <!-- Árbol der -->
+            <ellipse cx="420" cy="42" rx="10" ry="13" fill="#003087"/>
+            <rect x="418" y="52" width="4" height="12" fill="#005ea6"/>
+            <!-- Edificios der -->
+            <rect x="440" y="32" width="14" height="50" fill="#003087"/>
+            <rect x="456" y="44" width="10" height="38" fill="#005ea6"/>
+            <rect x="468" y="28" width="16" height="54" fill="#003087"/>
+            <rect x="442" y="36" width="3" height="3" fill="#FFC220" opacity="0.8"/>
+            <rect x="470" y="32" width="3" height="3" fill="#FFC220" opacity="0.8"/>
+          </svg>
+        </div>
+
+        <!-- Centro: badges + QR + spark -->
+        <div style="padding:16px;text-align:center;background:white;">
+          <div style="display:flex;justify-content:center;gap:8px;margin-bottom:14px;">
+            <div style="background:var(--blue);color:white;padding:4px 12px;border-radius:20px;font-size:.7rem;font-weight:800;letter-spacing:.05em;">🍽️ COMEDOR WALMART</div>
+            <div style="background:var(--yellow);color:var(--blue-dark);padding:4px 12px;border-radius:20px;font-size:.7rem;font-weight:800;">📱 Escanea aquí</div>
+          </div>
+
+          <!-- QR con borde punteado y spark -->
+          <div style="display:flex;align-items:center;justify-content:center;gap:0;">
+            <!-- Icono izq: tenedor -->
+            <div style="width:48px;display:flex;flex-direction:column;align-items:center;">
+              <svg viewBox="0 0 40 80" style="width:36px;">
+                <line x1="20" y1="0" x2="20" y2="80" stroke="#0071CE" stroke-width="3" opacity="0.25"/>
+                <rect x="14" y="20" width="4" height="28" rx="2" fill="#0071CE"/>
+                <rect x="22" y="20" width="4" height="28" rx="2" fill="#0071CE"/>
+                <rect x="18" y="20" width="4" height="28" rx="2" fill="#0071CE"/>
+                <rect x="14" y="46" width="12" height="18" rx="2" fill="#0071CE" opacity="0.7"/>
+                <text x="20" y="72" text-anchor="middle" font-size="14" fill="#FFC220">🍽️</text>
+              </svg>
+            </div>
+
+            <!-- QR frame -->
+            <div style="position:relative;border:3px dashed var(--blue);border-radius:14px;padding:10px;background:white;flex:1;max-width:220px;">
+              <div id="qr-comedor"></div>
+              <!-- Spark overlay -->
+              <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:50px;height:50px;background:white;border-radius:50%;border:2px solid var(--blue);display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:10;">
+                <svg width="32" height="32" viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="19" fill="white" stroke="#0071CE" stroke-width="1.5"/>
+                  <g transform="translate(20,20)">
+                    <line x1="0" y1="-11" x2="0" y2="-5.5" stroke="#FFC220" stroke-width="3.5" stroke-linecap="round"/>
+                    <line x1="9.5" y1="-5.5" x2="4.8" y2="-2.7" stroke="#FFC220" stroke-width="3.5" stroke-linecap="round"/>
+                    <line x1="9.5" y1="5.5" x2="4.8" y2="2.7" stroke="#FFC220" stroke-width="3.5" stroke-linecap="round"/>
+                    <line x1="0" y1="11" x2="0" y2="5.5" stroke="#FFC220" stroke-width="3.5" stroke-linecap="round"/>
+                    <line x1="-9.5" y1="5.5" x2="-4.8" y2="2.7" stroke="#FFC220" stroke-width="3.5" stroke-linecap="round"/>
+                    <line x1="-9.5" y1="-5.5" x2="-4.8" y2="-2.7" stroke="#FFC220" stroke-width="3.5" stroke-linecap="round"/>
+                  </g>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Icono der: taza/café -->
+            <div style="width:48px;display:flex;flex-direction:column;align-items:center;">
+              <svg viewBox="0 0 40 80" style="width:36px;">
+                <line x1="20" y1="0" x2="20" y2="80" stroke="#0071CE" stroke-width="3" opacity="0.25"/>
+                <text x="20" y="50" text-anchor="middle" font-size="22" fill="#0071CE">🥄</text>
+              </svg>
+            </div>
+          </div>
+
+          <div style="font-size:.85rem;font-weight:800;color:var(--blue);margin-top:14px;">Escanea con la cámara de tu celular</div>
+          <div style="font-size:.72rem;color:var(--text2);margin-bottom:14px;">No necesitas ninguna app adicional</div>
+
+          <!-- Pasos -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px;text-align:left;">
+            <div style="background:#f0f6ff;border-radius:10px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px;font-size:.73rem;color:var(--text);line-height:1.4;">
+              <div style="width:20px;height:20px;background:var(--blue);color:white;border-radius:50%;font-size:.65rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+              Abre la cámara y escanea el QR
+            </div>
+            <div style="background:#f0f6ff;border-radius:10px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px;font-size:.73rem;color:var(--text);line-height:1.4;">
+              <div style="width:20px;height:20px;background:var(--blue);color:white;border-radius:50%;font-size:.65rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+              Selecciona la categoría del reporte
+            </div>
+            <div style="background:#f0f6ff;border-radius:10px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px;font-size:.73rem;color:var(--text);line-height:1.4;">
+              <div style="width:20px;height:20px;background:var(--blue);color:white;border-radius:50%;font-size:.65rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+              Llena los datos y describe la oportunidad
+            </div>
+            <div style="background:#f0f6ff;border-radius:10px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px;font-size:.73rem;color:var(--text);line-height:1.4;">
+              <div style="width:20px;height:20px;background:var(--blue);color:white;border-radius:50%;font-size:.65rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
+              Envía y recibe tu folio de seguimiento
+            </div>
+          </div>
+        </div>
+
+        <!-- Pie azul -->
+        <div style="background:var(--blue);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;flex:1;">
+            <svg width="40" height="40" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
+              <rect x="10" y="16" width="26" height="22" rx="3" fill="#FFC220"/>
+              <rect x="10" y="16" width="26" height="8" rx="3" fill="#e6aa00"/>
+              <line x1="23" y1="16" x2="23" y2="38" stroke="#e6aa00" stroke-width="1.5"/>
+              <line x1="2" y1="22" x2="9" y2="22" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="1" y1="27" x2="8" y2="27" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+              <line x1="3" y1="32" x2="9" y2="32" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+            </svg>
+            <div>
+              <div style="color:var(--yellow);font-size:.82rem;font-weight:800;">Tu opinión mejora el comedor,</div>
+              <div style="color:var(--yellow);font-size:.82rem;font-weight:800;font-style:italic;">¡reporta lo que detectes!</div>
+            </div>
+          </div>
+          <div style="width:1.5px;height:40px;background:rgba(255,255,255,.3);flex-shrink:0;"></div>
+          <div style="text-align:right;">
+            <div style="color:white;font-size:.92rem;font-weight:800;display:flex;align-items:center;gap:5px;justify-content:flex-end;">
+              Walmart
+              <svg width="16" height="16" viewBox="0 0 40 40">
+                <g transform="translate(20,20)">
+                  <line x1="0" y1="-13" x2="0" y2="-6.5" stroke="#FFC220" stroke-width="4" stroke-linecap="round"/>
+                  <line x1="11.3" y1="-6.5" x2="5.6" y2="-3.2" stroke="#FFC220" stroke-width="4" stroke-linecap="round"/>
+                  <line x1="11.3" y1="6.5" x2="5.6" y2="3.2" stroke="#FFC220" stroke-width="4" stroke-linecap="round"/>
+                  <line x1="0" y1="13" x2="0" y2="6.5" stroke="#FFC220" stroke-width="4" stroke-linecap="round"/>
+                  <line x1="-11.3" y1="6.5" x2="-5.6" y2="3.2" stroke="#FFC220" stroke-width="4" stroke-linecap="round"/>
+                  <line x1="-11.3" y1="-6.5" x2="-5.6" y2="-3.2" stroke="#FFC220" stroke-width="4" stroke-linecap="round"/>
+                </g>
+              </svg>
+            </div>
+            <div style="color:rgba(255,255,255,.75);font-size:.65rem;">México y Centroamérica</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <button onclick="window.print()" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;padding:13px;background:var(--yellow);color:var(--blue-dark);border:none;border-radius:12px;font-weight:800;font-size:.9rem;cursor:pointer;">🖨️ Imprimir para colocar en el comedor</button>
+  <button id="btn-qr-volver" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:8px;padding:11px;background:white;color:var(--text);border:1.5px solid var(--border);border-radius:12px;font-weight:700;font-size:.88rem;cursor:pointer;">← Volver al formulario</button>
+</div>
+
+</body>
+</html>
