@@ -61,6 +61,7 @@ async function openModal(id) {
   document.getElementById('m-asociado').textContent = r.nombre || 'Anónimo';
   document.getElementById('m-empleado').textContent = r.numero_empleado;
   document.getElementById('m-desc').textContent = r.descripcion;
+  mostrarFotoEnModal(r.foto_url);
   document.getElementById('m-status-sel').value = r.estatus;
   document.getElementById('m-status-sel').dataset.original = r.estatus;
   document.getElementById('m-responsable').value = r.responsable || '';
@@ -95,6 +96,27 @@ async function cargarHistorial(reporteId) {
         ${new Date(h.creado_en).toLocaleString('es-MX')} - ${escapeHtml(h.usuario)}${h.nota ? `<br>${escapeHtml(h.nota)}` : ''}
       </div>
     </div>`).join('');
+}
+
+// Muestra la foto de evidencia en el modal si el reporte tiene una (foto_url),
+// o un texto "Sin foto adjunta" si no. La imagen es clickeable para abrirla
+// a tamano completo en una pestana nueva.
+function mostrarFotoEnModal(fotoUrl) {
+  const img = document.getElementById('m-foto-img');
+  const link = document.getElementById('m-foto-link');
+  const vacio = document.getElementById('m-foto-vacio');
+  if (fotoUrl) {
+    img.src = fotoUrl;
+    link.href = fotoUrl;
+    img.style.display = 'block';
+    link.style.display = 'block';
+    vacio.style.display = 'none';
+  } else {
+    img.removeAttribute('src');
+    img.style.display = 'none';
+    link.style.display = 'none';
+    vacio.style.display = 'block';
+  }
 }
 
 function closeModal() {
