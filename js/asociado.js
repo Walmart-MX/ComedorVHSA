@@ -123,19 +123,23 @@ async function enviarReporte() {
 
   const foto_url = await subirFoto();
 
-  const { data, error } = await supabase
-    .from('reportes')
-    .insert({
-      categoria: currentCat,
-      cedis, comedor,
-      nombre: document.getElementById('f-nombre').value.trim() || null,
-      numero_empleado,
-      descripcion,
-      prioridad: PRIORIDADES[currentCat],
-      foto_url
-    })
-    .select()
-    .single();
+  // Usamos un RPC (funcion de base de datos) en vez de insert().select()
+  // directo: el rol anon puede INSERTAR pero a proposito no puede LEER
+  // la tabla reportes en general (para que nadie sin login pueda listar
+  // todos los reportes via la API). insert().select() exige una politica
+  // de SELECT para el RETURNING, lo cual rompia con 'row-level security
+  // policy'. El RPC corre con privilegios elevados y solo regresa los
+  // campos que esta pantalla necesita.
+  const { data, error } = await supabase.rpc('crear_reporte', {
+    p_categoria: currentCat,
+    p_cedis: cedis,
+    p_comedor: comedor,
+    p_nombre: document.getElementById('f-nombre').value.trim() || null,
+    p_numero_empleado: numero_empleado,
+    p_descripcion: descripcion,
+    p_prioridad: PRIORIDADES[currentCat],
+    p_foto_url: foto_url
+  });
 
   btn.disabled = false;
   btn.textContent = 'Enviar reporte';
@@ -146,7 +150,7 @@ async function enviarReporte() {
     return;
   }
 
-  mostrarConfirmacion(data);
+  mostrarConfirmacion(data[0]);
 }
 
 function mostrarConfirmacion(r) {
