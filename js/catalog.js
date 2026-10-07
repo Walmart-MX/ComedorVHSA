@@ -25,6 +25,16 @@ export const CEDIS_NAMES = {
   'cedis-campeche': 'CEDIS Campeche'
 };
 
+export const COMEDOR_NAMES = {
+  secos: 'Comedor Secos',
+  perecederos: 'Comedor Perecederos'
+};
+
+export const MODO_REPORTE_LABELS = {
+  anonimo: 'Anónimo',
+  personalizado: 'Personalizado (WhatsApp)'
+};
+
 export const PRI_LABELS = { alta: 'Alta', media: 'Media', baja: 'Baja' };
 export const PRI_BADGE = { alta: 'badge-red', media: 'badge-amber', baja: 'badge-green' };
 export const PRI_COLOR_VAR = { alta: 'var(--red)', media: 'var(--amber)', baja: 'var(--green)' };

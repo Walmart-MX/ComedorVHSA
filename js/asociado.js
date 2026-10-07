@@ -1,11 +1,12 @@
 import { supabase, isSupabaseConfigured } from './supabase-client.js';
-import { CAT_NAMES, PRIORIDADES, PRI_LABELS, PRI_COLOR_VAR } from './catalog.js';
+import { CAT_NAMES, COMEDOR_NAMES, PRIORIDADES, PRI_LABELS, PRI_COLOR_VAR } from './catalog.js';
 
 let currentCat = null;
 let currentFoto = null;
 
 export function initAsociado() {
   wireCategoryCards();
+  wireModoToggle();
   document.getElementById('btn-step2').addEventListener('click', goStep2);
   document.getElementById('btn-goback').addEventListener('click', goBack);
   document.getElementById('photo-area').addEventListener('click', () =>
@@ -44,6 +45,25 @@ function selectCat(card) {
   const btn = document.getElementById('btn-step2');
   btn.style.opacity = '1';
   btn.style.pointerEvents = 'auto';
+}
+
+/** Alterna los campos de nombre/numero/WhatsApp segun el modo elegido (anonimo vs personalizado). */
+function wireModoToggle() {
+  document.querySelectorAll('input[name="f-modo"]').forEach(radio =>
+    radio.addEventListener('change', actualizarVisibilidadModo));
+  actualizarVisibilidadModo();
+}
+
+function getModoActual() {
+  return document.querySelector('input[name="f-modo"]:checked')?.value || 'anonimo';
+}
+
+function actualizarVisibilidadModo() {
+  const esPersonalizado = getModoActual() === 'personalizado';
+  document.getElementById('campos-personalizados').classList.toggle('hidden', !esPersonalizado);
+  document.getElementById('modo-hint').textContent = esPersonalizado
+    ? 'Un asesor te dara seguimiento por WhatsApp con el numero que dejes aqui.'
+    : 'Tu reporte se publica en la plataforma sin datos personales.';
 }
 
 function goStep2() {
@@ -108,13 +128,30 @@ async function enviarReporte() {
     alert('El backend todavia no esta configurado. Intenta mas tarde.');
     return;
   }
-  const numero_empleado = document.getElementById('f-empleado').value.trim();
+  const modo = getModoActual();
   const cedis = document.getElementById('f-cedis').value;
   const comedor = document.getElementById('f-comedor').value;
   const descripcion = document.getElementById('f-desc').value.trim();
-  if (!numero_empleado || !cedis || !comedor || !descripcion) {
+
+  if (!cedis || !comedor || !descripcion) {
     alert('Por favor completa los campos obligatorios.');
     return;
+  }
+
+  // Los datos personales solo aplican (y son obligatorios) en modo personalizado.
+  let numero_empleado = null, nombre = null, telefono_whatsapp = null;
+  if (modo === 'personalizado') {
+    numero_empleado = document.getElementById('f-empleado').value.trim();
+    nombre = document.getElementById('f-nombre').value.trim();
+    telefono_whatsapp = document.getElementById('f-whatsapp').value.trim();
+    if (!numero_empleado || !nombre || !telefono_whatsapp) {
+      alert('Para el reporte personalizado, completa tu numero de asociado, nombre y WhatsApp.');
+      return;
+    }
+    if (!/^\d{10}$/.test(telefono_whatsapp.replace(/\D/g, ''))) {
+      alert('Ingresa un numero de WhatsApp valido a 10 digitos.');
+      return;
+    }
   }
 
   const btn = document.getElementById('btn-enviar-reporte');
@@ -134,11 +171,13 @@ async function enviarReporte() {
     p_categoria: currentCat,
     p_cedis: cedis,
     p_comedor: comedor,
-    p_nombre: document.getElementById('f-nombre').value.trim() || null,
+    p_nombre: nombre,
     p_numero_empleado: numero_empleado,
     p_descripcion: descripcion,
     p_prioridad: PRIORIDADES[currentCat],
-    p_foto_url: foto_url
+    p_foto_url: foto_url,
+    p_modo_reporte: modo,
+    p_telefono_whatsapp: telefono_whatsapp
   });
 
   btn.disabled = false;
@@ -162,7 +201,7 @@ function mostrarConfirmacion(r) {
   document.getElementById('c-fecha').textContent = new Date(r.creado_en).toLocaleString('es-MX');
   const cedisLabel = document.querySelector(`#f-cedis option[value="${r.cedis}"]`)?.textContent;
   document.getElementById('c-cedis').textContent = cedisLabel || r.cedis;
-  document.getElementById('c-comedor').textContent = r.comedor === 'principal' ? 'Comedor Principal' : 'Comedor Secundario';
+  document.getElementById('c-comedor').textContent = COMEDOR_NAMES[r.comedor] || r.comedor;
 }
 
 function nuevoReporte() {
@@ -170,6 +209,9 @@ function nuevoReporte() {
   document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
   document.getElementById('f-empleado').value = '';
   document.getElementById('f-nombre').value = '';
+  document.getElementById('f-whatsapp').value = '';
+  document.getElementById('f-modo-anonimo').checked = true;
+  actualizarVisibilidadModo();
   document.getElementById('f-cedis').value = '';
   document.getElementById('f-comedor').value = '';
   document.getElementById('f-desc').value = '';

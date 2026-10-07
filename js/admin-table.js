@@ -1,7 +1,7 @@
 import { supabase, isSupabaseConfigured } from './supabase-client.js';
 import {
-  CAT_NAMES, CEDIS_NAMES, PRI_LABELS, PRI_BADGE,
-  STATUS_LABELS, STATUS_BADGE, escapeHtml
+  CAT_NAMES, CEDIS_NAMES, COMEDOR_NAMES, PRI_LABELS, PRI_BADGE,
+  STATUS_LABELS, STATUS_BADGE, MODO_REPORTE_LABELS, escapeHtml
 } from './catalog.js';
 import { getCachedReportes } from './admin-dashboard.js';
 
@@ -36,10 +36,10 @@ export function renderTabla() {
       <td><span class="td-folio" data-id="${x.id}">${escapeHtml(x.folio)}${x.es_demo ? '<br><span style="font-size:.6rem;color:var(--text2);">demo</span>' : ''}</span></td>
       <td>${escapeHtml(x.creado_en.split('T')[0])}</td><td>${escapeHtml(x.creado_en.split('T')[1]?.slice(0, 5) || '')}</td>
       <td>${escapeHtml(CEDIS_NAMES[x.cedis] || x.cedis)}</td>
-      <td>${x.comedor === 'principal' ? 'Principal' : 'Secundario'}</td>
+      <td>${COMEDOR_NAMES[x.comedor] || x.comedor}</td>
       <td>${escapeHtml(CAT_NAMES[x.categoria] || x.categoria)}</td>
       <td><span class="badge ${PRI_BADGE[x.prioridad]}">${PRI_LABELS[x.prioridad]}</span></td>
-      <td>${escapeHtml(x.nombre || 'Anónimo')}<br><span style="font-size:.68rem;color:var(--text2);">${escapeHtml(x.numero_empleado)}</span></td>
+      <td>${escapeHtml(x.nombre || 'Anónimo')}<br><span style="font-size:.68rem;color:var(--text2);">${escapeHtml(x.numero_empleado || '—')}</span></td>
       <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(x.descripcion)}">${escapeHtml(x.descripcion)}</td>
       <td><span class="badge ${STATUS_BADGE[x.estatus]}">${STATUS_LABELS[x.estatus]}</span></td>
     </tr>`).join('');
@@ -57,9 +57,10 @@ async function openModal(id) {
   document.getElementById('m-cat').textContent = CAT_NAMES[r.categoria] || r.categoria;
   document.getElementById('m-pri').textContent = PRI_LABELS[r.prioridad];
   document.getElementById('m-cedis').textContent = CEDIS_NAMES[r.cedis] || r.cedis;
-  document.getElementById('m-comedor').textContent = r.comedor === 'principal' ? 'Principal' : 'Secundario';
+  document.getElementById('m-comedor').textContent = COMEDOR_NAMES[r.comedor] || r.comedor;
   document.getElementById('m-asociado').textContent = r.nombre || 'Anónimo';
-  document.getElementById('m-empleado').textContent = r.numero_empleado;
+  document.getElementById('m-empleado').textContent = r.numero_empleado || '—';
+  mostrarContactoWhatsApp(r);
   document.getElementById('m-desc').textContent = r.descripcion;
   mostrarFotoEnModal(r.foto_url);
   document.getElementById('m-status-sel').value = r.estatus;
@@ -101,6 +102,28 @@ async function cargarHistorial(reporteId) {
 // Muestra la foto de evidencia en el modal si el reporte tiene una (foto_url),
 // o un texto "Sin foto adjunta" si no. La imagen es clickeable para abrirla
 // a tamano completo en una pestana nueva.
+// Reportes personalizados traen telefono de WhatsApp: mostramos un boton
+// directo "wa.me" con un mensaje pre-armado para que el admin de seguimiento
+// 1-a-1 sin necesidad de copiar/pegar el numero a mano.
+function mostrarContactoWhatsApp(r) {
+  const row = document.getElementById('m-whatsapp-row');
+  const link = document.getElementById('m-whatsapp-link');
+  const badge = document.getElementById('m-modo-badge');
+  badge.textContent = MODO_REPORTE_LABELS[r.modo_reporte] || r.modo_reporte;
+  badge.className = `badge ${r.modo_reporte === 'personalizado' ? 'badge-blue' : 'badge-gray'}`;
+
+  if (r.modo_reporte === 'personalizado' && r.telefono_whatsapp) {
+    const digitos = r.telefono_whatsapp.replace(/\D/g, '');
+    const mensaje = encodeURIComponent(
+      `Hola ${r.nombre || ''}, te contactamos de Walmart CEDIS por tu reporte ${r.folio} sobre el comedor. Estamos dando seguimiento.`
+    );
+    link.href = `https://wa.me/52${digitos}?text=${mensaje}`;
+    row.style.display = 'block';
+  } else {
+    row.style.display = 'none';
+  }
+}
+
 function mostrarFotoEnModal(fotoUrl) {
   const img = document.getElementById('m-foto-img');
   const link = document.getElementById('m-foto-link');
@@ -154,9 +177,9 @@ function exportCSV() {
   const csvCell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
   const rows = r.map(x => [
     x.folio, x.creado_en.split('T')[0], CEDIS_NAMES[x.cedis] || x.cedis,
-    x.comedor === 'principal' ? 'Principal' : 'Secundario',
+    COMEDOR_NAMES[x.comedor] || x.comedor,
     CAT_NAMES[x.categoria] || x.categoria, x.prioridad, x.nombre || 'Anonimo',
-    x.numero_empleado, x.descripcion, x.estatus, x.responsable || '', x.accion || '',
+    x.numero_empleado || '', x.descripcion, x.estatus, x.responsable || '', x.accion || '',
     x.es_demo ? 'SI' : 'NO'
   ].map(csvCell).join(','));
   const csv = [headers.map(csvCell).join(','), ...rows].join('\n');

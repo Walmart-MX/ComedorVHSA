@@ -112,15 +112,37 @@
       </div>
 
       <div class="step-section">
-        <!-- No. Empleado -->
+        <!-- Tipo de reporte: anonimo vs personalizado -->
         <div class="form-field">
-          <label class="form-label">No. de Asociado <span>*</span></label>
-          <input class="form-input" id="f-empleado" type="text" placeholder="Ej. 8155457" maxlength="15">
+          <label class="form-label">Tipo de reporte <span>*</span></label>
+          <div class="modo-toggle" role="radiogroup" aria-label="Tipo de reporte">
+            <label class="modo-option">
+              <input type="radio" name="f-modo" id="f-modo-anonimo" value="anonimo" checked>
+              <span>Anónimo</span>
+            </label>
+            <label class="modo-option">
+              <input type="radio" name="f-modo" id="f-modo-personalizado" value="personalizado">
+              <span>Personalizado</span>
+            </label>
+          </div>
+          <div class="form-hint" id="modo-hint">Tu reporte se publica en la plataforma sin datos personales.</div>
         </div>
-        <!-- Nombre -->
-        <div class="form-field">
-          <label class="form-label">Nombre (opcional)</label>
-          <input class="form-input" id="f-nombre" type="text" placeholder="Tu nombre">
+
+        <!-- Campos solo para reporte personalizado -->
+        <div id="campos-personalizados" class="hidden">
+          <div class="form-field">
+            <label class="form-label">No. de Asociado <span>*</span></label>
+            <input class="form-input" id="f-empleado" type="text" placeholder="Ej. 8155457" maxlength="15">
+          </div>
+          <div class="form-field">
+            <label class="form-label">Nombre completo <span>*</span></label>
+            <input class="form-input" id="f-nombre" type="text" placeholder="Tu nombre completo">
+          </div>
+          <div class="form-field">
+            <label class="form-label">Número de WhatsApp <span>*</span></label>
+            <input class="form-input" id="f-whatsapp" type="tel" placeholder="Ej. 9931234567" maxlength="15">
+            <div class="form-hint">Aquí recibirás el seguimiento de tu reporte.</div>
+          </div>
         </div>
         <!-- CEDIS -->
         <div class="form-field">
@@ -138,8 +160,8 @@
           <label class="form-label">Comedor <span>*</span></label>
           <select class="form-select" id="f-comedor">
             <option value="">— Selecciona —</option>
-            <option value="principal">Comedor Principal</option>
-            <option value="secundario">Comedor Secundario</option>
+            <option value="secos">Comedor Secos</option>
+            <option value="perecederos">Comedor Perecederos</option>
           </select>
         </div>
         <!-- Fecha/Hora auto -->
@@ -375,6 +397,11 @@
         <div class="detail-row"><span>Prioridad</span><span id="m-pri">—</span></div>
         <div class="detail-row"><span>CEDIS</span><span id="m-cedis">—</span></div>
         <div class="detail-row"><span>Comedor</span><span id="m-comedor">—</span></div>
+        <div class="detail-row"><span>Tipo de reporte</span><span id="m-modo-badge" class="badge badge-gray">—</span></div>
+        <div class="detail-row" id="m-whatsapp-row" style="display:none;">
+          <span>Contacto</span>
+          <a id="m-whatsapp-link" href="#" target="_blank" rel="noopener" class="btn-secondary" style="display:inline-block;width:auto;padding:6px 14px;font-size:.75rem;text-decoration:none;"> Contactar por WhatsApp</a>
+        </div>
         <div class="detail-row"><span>Asociado</span><span id="m-asociado">—</span></div>
         <div class="detail-row"><span>No. Empleado</span><span id="m-empleado">—</span></div>
         <div class="detail-row"><span>Descripción</span><span id="m-desc">—</span></div>

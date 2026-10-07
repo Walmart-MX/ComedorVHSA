@@ -138,6 +138,11 @@ button,select,input,textarea{font-family:inherit;}
 .form-textarea{resize:vertical;min-height:90px;}
 .form-hint{font-size:.68rem;color:var(--text2);margin-top:4px;}
 
+.modo-toggle{display:flex;gap:8px;}
+.modo-option{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 8px;border:2px solid #e2e2e2;border-radius:10px;cursor:pointer;font-size:.82rem;font-weight:600;transition:border-color .15s,background .15s;}
+.modo-option:has(input:checked){border-color:var(--blue);background:#eff6ff;}
+.modo-option input{margin:0;}
+
 /* Campo auto */
 .auto-field{
   background:#f0f6ff;border:1.5px solid #c8dcf5;
