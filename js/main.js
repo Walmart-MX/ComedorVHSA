@@ -1,4 +1,5 @@
 import { initAsociado } from './asociado.js';
+import { initConsulta } from './consulta.js';
 import { initAuth } from './auth.js';
 import { initQR } from './qr.js';
 import { isSupabaseConfigured } from './supabase-client.js';
@@ -11,13 +12,10 @@ if (!isSupabaseConfigured) {
 }
 
 initAsociado();
+initConsulta();
 initQR();
 initAdminTable();
 initAuth({ onLogin: onAdminLogin });
-
-document.getElementById('admin-cedis-filter')?.addEventListener('change', () => {
-  refrescarTodo();
-});
 
 document.querySelectorAll('.nav-tab').forEach(tab => {
   tab.addEventListener('click', () => showAdminTab(tab.dataset.tab, tab));

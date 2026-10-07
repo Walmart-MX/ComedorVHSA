@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase-client.js';
-import { CAT_NAMES, CEDIS_NAMES, escapeHtml } from './catalog.js';
+import { CAT_NAMES, COMEDOR_NAMES, escapeHtml } from './catalog.js';
 
 let cachedReportes = [];
 
@@ -12,10 +12,7 @@ export async function cargarReportes() {
     cachedReportes = [];
     return cachedReportes;
   }
-  const cedisF = document.getElementById('admin-cedis-filter')?.value || 'todos';
-  let query = supabase.from('reportes').select('*').order('creado_en', { ascending: false });
-  if (cedisF !== 'todos') query = query.eq('cedis', cedisF);
-  const { data, error } = await query;
+  const { data, error } = await supabase.from('reportes').select('*').order('creado_en', { ascending: false });
   if (error) {
     console.error('No se pudieron cargar los reportes:', error.message);
     cachedReportes = [];
@@ -29,6 +26,11 @@ export async function renderDashboard() {
   const r = await cargarReportes();
   const hoy = new Date().toISOString().split('T')[0];
   const fechaDe = (x) => x.creado_en.split('T')[0];
+  const hoyISO = new Date().toISOString().split('T')[0];
+  const vencidos = r.filter(x =>
+    x.fecha_compromiso && x.fecha_compromiso < hoyISO &&
+    x.estatus !== 'atendido' && x.estatus !== 'cerrado'
+  ).length;
 
   const kpis = [
     { n: r.length, l: 'Total de reportes', c: '' },
@@ -37,7 +39,7 @@ export async function renderDashboard() {
     { n: r.filter(x => x.estatus === 'revision').length, l: 'En revisión', c: 'amber' },
     { n: r.filter(x => x.estatus === 'atendido').length, l: 'Atendidos', c: 'green' },
     { n: r.filter(x => x.estatus === 'cerrado').length, l: 'Cerrados', c: '' },
-    { n: r.filter(x => x.prioridad === 'alta').length, l: 'Prioridad alta', c: 'red' },
+    { n: vencidos, l: 'Vencidos', c: vencidos > 0 ? 'red' : '' },
     { n: tiempoPromedioGlobal(r), l: 'Tiempo prom. atención (días)', c: '' }
   ];
   document.getElementById('kpi-grid').innerHTML = kpis.map(k =>
@@ -51,7 +53,7 @@ export async function renderDashboard() {
     { label: 'Media', valor: r.filter(x => x.prioridad === 'media').length, clase: 'amber' },
     { label: 'Baja', valor: r.filter(x => x.prioridad === 'baja').length, clase: 'green' }
   ]);
-  renderBarChart('chart-cedis', agruparPor(r, 'cedis', CEDIS_NAMES));
+  renderBarChart('chart-cedis', agruparPor(r, 'comedor', COMEDOR_NAMES));
 
   renderTendenciaAlert(r);
 }

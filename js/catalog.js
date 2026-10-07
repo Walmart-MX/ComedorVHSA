@@ -48,6 +48,20 @@ export const STATUS_BADGE = {
   atendido: 'badge-green', cerrado: 'badge-gray'
 };
 
+// Traduccion a lenguaje humano para el asociado (pantalla de confirmacion y
+// consulta de folio). Los nombres internos (arriba) son para el admin.
+export const STATUS_PUBLICO = {
+  pendiente: 'Recibimos tu reporte',
+  revision: 'El equipo esta revisando tu reporte',
+  atendido: 'Tu reporte fue atendido',
+  cerrado: 'Tu reporte fue atendido y cerrado'
+};
+
+// Unica sede operando actualmente. La tabla/BD sigue soportando otros CEDIS
+// (ver CEDIS_NAMES) para no cerrar la puerta a futuro, pero la interfaz
+// publica ya no pide elegir CEDIS -- se usa este valor fijo.
+export const DEFAULT_CEDIS = 'cedis-villahermosa';
+
 /** Escapa texto generado por usuarios antes de insertarlo en innerHTML (anti-XSS). */
 export function escapeHtml(str) {
   if (str === null || str === undefined) return '';

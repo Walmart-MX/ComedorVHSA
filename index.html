@@ -32,6 +32,8 @@
         <p>¿Detectaste alguna oportunidad en el servicio de comedor? Ayúdanos a identificarla y mejorar la experiencia de todos.</p>
       </div>
 
+      <button type="button" id="btn-ir-consulta" class="link-button">¿Ya hiciste un reporte? Consulta su estado aquí</button>
+
       <div class="step-bar">
         <div class="step-dot active" id="sd1">1</div>
         <div class="step-line" id="sl1"></div>
@@ -112,50 +114,35 @@
       </div>
 
       <div class="step-section">
-        <!-- Tipo de reporte: anonimo vs personalizado -->
+        <!-- Identificacion: anonimo vs personalizado -->
+        <div class="field-group-title">Identificación</div>
         <div class="form-field">
-          <label class="form-label">Tipo de reporte <span>*</span></label>
           <div class="modo-toggle" role="radiogroup" aria-label="Tipo de reporte">
             <label class="modo-option">
               <input type="radio" name="f-modo" id="f-modo-anonimo" value="anonimo" checked>
-              <span>Anónimo</span>
+              <span>Reportar anónimo</span>
             </label>
             <label class="modo-option">
               <input type="radio" name="f-modo" id="f-modo-personalizado" value="personalizado">
-              <span>Personalizado</span>
+              <span>Reportar con mis datos</span>
             </label>
           </div>
-          <div class="form-hint" id="modo-hint">Tu reporte se publica en la plataforma sin datos personales.</div>
+          <div class="form-hint" id="modo-hint">No se asociará tu reporte con tus datos personales.</div>
         </div>
 
-        <!-- Campos solo para reporte personalizado -->
+        <!-- Campos solo para reporte personalizado: numero de asociado -> busqueda en la base -->
         <div id="campos-personalizados" class="hidden">
           <div class="form-field">
-            <label class="form-label">No. de Asociado <span>*</span></label>
-            <input class="form-input" id="f-empleado" type="text" placeholder="Ej. 8155457" maxlength="15">
-          </div>
-          <div class="form-field">
-            <label class="form-label">Nombre completo <span>*</span></label>
-            <input class="form-input" id="f-nombre" type="text" placeholder="Tu nombre completo">
-          </div>
-          <div class="form-field">
-            <label class="form-label">Número de WhatsApp <span>*</span></label>
-            <input class="form-input" id="f-whatsapp" type="tel" placeholder="Ej. 9931234567" maxlength="15">
-            <div class="form-hint">Aquí recibirás el seguimiento de tu reporte.</div>
+            <label class="form-label" for="f-empleado">Número de asociado <span>*</span></label>
+            <div style="display:flex;gap:8px;">
+              <input class="form-input" id="f-empleado" type="text" inputmode="numeric" placeholder="Ej. 8155457" maxlength="15" style="flex:1;">
+              <button type="button" class="btn-secondary" id="btn-verificar-asociado" style="width:auto;padding:0 16px;">Verificar</button>
+            </div>
+            <div id="asociado-resultado" class="hidden"></div>
           </div>
         </div>
-        <!-- CEDIS -->
-        <div class="form-field">
-          <label class="form-label">CEDIS <span>*</span></label>
-          <select class="form-select" id="f-cedis">
-            <option value="">— Selecciona —</option>
-            <option value="cedis-villahermosa">CEDIS Villahermosa</option>
-            <option value="cedis-merida">CEDIS Mérida</option>
-            <option value="cedis-queretaro">CEDIS Querétaro</option>
-            <option value="cedis-campeche">CEDIS Campeche</option>
-          </select>
-        </div>
-        <!-- Comedor -->
+        <!-- Ubicacion -->
+        <div class="field-group-title">Ubicación</div>
         <div class="form-field">
           <label class="form-label">Comedor <span>*</span></label>
           <select class="form-select" id="f-comedor">
@@ -173,35 +160,27 @@
           </div>
           <div class="form-hint">Capturada automáticamente</div>
         </div>
-        <!-- Descripción -->
+        <!-- Situacion -->
+        <div class="field-group-title">Situación</div>
         <div class="form-field">
-          <label class="form-label">Descripción de la oportunidad <span>*</span></label>
-          <textarea class="form-textarea" id="f-desc" placeholder="Describe con detalle qué ocurrió, dónde y cuándo dentro del comedor..."></textarea>
+          <label class="form-label">¿Qué ocurrió? <span>*</span></label>
+          <textarea class="form-textarea" id="f-desc" placeholder="Describe con detalle qué ocurrió y dónde dentro del comedor..."></textarea>
         </div>
         <!-- Foto -->
+        <div class="field-group-title">Evidencia (opcional)</div>
         <div class="form-field">
-          <label class="form-label">Evidencia fotográfica (opcional)</label>
+          <label class="form-label">Fotografía</label>
           <div class="photo-area" id="photo-area">
-            <div style="font-size:2rem;">📷</div>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue);margin:0 auto 6px;display:block;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
             <p>Toca para tomar o seleccionar foto</p>
             <small>JPG, PNG — máx. 5 MB</small>
           </div>
           <input type="file" id="f-foto" accept="image/*" capture="environment" style="display:none;">
           <img id="photo-preview" alt="Vista previa">
-          <button type="button" id="btn-remove-foto" class="btn-secondary hidden" style="margin-top:6px;width:auto;padding:6px 14px;font-size:.75rem;">✕ Quitar foto</button>
+          <button type="button" id="btn-remove-foto" class="btn-secondary hidden" style="margin-top:6px;width:auto;padding:6px 14px;font-size:.75rem;"> Quitar foto</button>
         </div>
 
-        <!-- Prioridad calculada -->
-        <div class="form-field">
-          <label class="form-label">Prioridad del reporte</label>
-          <div class="prioridad-display" id="pri-display">
-            <div class="pri-dot" id="pri-dot" style="background:var(--amber);"></div>
-            <span id="pri-label" style="font-size:.82rem;font-weight:700;">Media</span>
-            <span style="font-size:.72rem;color:var(--text2);margin-left:4px;">— Calculada automáticamente</span>
-          </div>
-        </div>
-
-        <button class="btn-primary" id="btn-enviar-reporte">✅ Enviar reporte</button>
+        <button class="btn-primary" id="btn-enviar-reporte">Enviar reporte</button>
         <button class="btn-secondary" id="btn-goback">← Cambiar categoría</button>
       </div>
     </div>
@@ -216,16 +195,58 @@
       <div class="folio-box">
         <div class="folio-label">Folio de seguimiento</div>
         <div class="folio-num" id="c-folio">—</div>
+        <button type="button" class="btn-secondary" id="btn-copiar-folio" style="width:auto;padding:6px 14px;font-size:.75rem;margin-top:10px;">Copiar folio</button>
       </div>
       <div class="confirm-detail">
         <div class="confirm-row"><span>Categoría</span><span id="c-cat">—</span></div>
-        <div class="confirm-row"><span>Prioridad</span><span id="c-pri">—</span></div>
+        <div class="confirm-row"><span>Ubicación</span><span id="c-comedor">—</span></div>
         <div class="confirm-row"><span>Fecha</span><span id="c-fecha">—</span></div>
-        <div class="confirm-row"><span>CEDIS</span><span id="c-cedis">—</span></div>
-        <div class="confirm-row"><span>Comedor</span><span id="c-comedor">—</span></div>
+        <div class="confirm-row"><span>Estado</span><span id="c-estado">—</span></div>
       </div>
-      <p style="font-size:.75rem;color:var(--text2);max-width:280px;">Guarda tu folio para consultar el estatus de tu reporte con el área de recursos humanos o tu supervisor.</p>
-      <button class="btn-primary" id="btn-nuevo-reporte" style="margin-top:20px;max-width:280px;">+ Nuevo reporte</button>
+      <p style="font-size:.78rem;color:var(--text2);max-width:300px;">Guarda tu folio: puedes consultar el avance de tu reporte cuando quieras desde "Consultar mi reporte" en la pantalla principal.</p>
+      <a id="btn-whatsapp-confirmar" href="#" target="_blank" rel="noopener" class="btn-secondary hidden" style="max-width:280px;display:block;text-align:center;text-decoration:none;margin-top:10px;">Confirmar por WhatsApp</a>
+      <button class="btn-primary" id="btn-nuevo-reporte" style="margin-top:14px;max-width:280px;">Hacer otro reporte</button>
+    </div>
+  </div>
+
+  <!-- CONSULTAR REPORTE -->
+  <div id="step-consulta" class="hidden">
+    <div class="aso-header">
+      <h1>Consultar mi reporte</h1>
+      <p>Escribe el folio que recibiste al enviar tu reporte.</p>
+    </div>
+    <div style="padding:20px 16px 24px;">
+      <div class="form-field">
+        <label class="form-label" for="consulta-folio">Folio del reporte</label>
+        <input class="form-input" id="consulta-folio" type="text" placeholder="Ej. COM-2026-000123">
+      </div>
+      <button class="btn-primary" id="btn-consultar-folio">Consultar reporte</button>
+      <button class="btn-secondary" id="btn-volver-inicio-consulta" style="margin-top:10px;">← Volver al inicio</button>
+
+      <div id="consulta-cargando" class="hidden" style="margin-top:20px;font-size:.82rem;color:var(--text2);text-align:center;">Buscando tu reporte...</div>
+
+      <div id="consulta-no-encontrado" class="hidden" style="margin-top:20px;background:#fff3cd;color:#664d03;padding:14px;border-radius:10px;font-size:.82rem;">
+        No encontramos un reporte con ese folio. Verifica que esté completo y sin espacios.
+      </div>
+
+      <div id="consulta-resultado" class="hidden" style="margin-top:20px;">
+        <div class="confirm-detail">
+          <div class="confirm-row"><span>Folio</span><span id="q-folio">—</span></div>
+          <div class="confirm-row"><span>Categoría</span><span id="q-cat">—</span></div>
+          <div class="confirm-row"><span>Ubicación</span><span id="q-comedor">—</span></div>
+          <div class="confirm-row"><span>Fecha</span><span id="q-fecha">—</span></div>
+          <div class="confirm-row"><span>Última actualización</span><span id="q-actualizado">—</span></div>
+        </div>
+        <div class="detail-section" style="margin-top:16px;">
+          <h4>Estado actual</h4>
+          <p id="q-estado" style="font-size:.9rem;font-weight:700;color:var(--blue);">—</p>
+          <p id="q-desc" style="font-size:.82rem;color:var(--text2);margin-top:4px;">—</p>
+        </div>
+        <div class="detail-section" style="margin-top:16px;">
+          <h4>Avance</h4>
+          <div id="q-historial"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -261,15 +282,8 @@
 ═══════════════════════════════════ -->
 <div id="app-admin" class="hidden">
   <div class="admin-header-bar">
-    <h1>🍽️ Reportes Comedor</h1>
+    <h1>Reportes Comedor</h1>
     <div class="right">
-      <select class="admin-cedis-sel" id="admin-cedis-filter">
-        <option value="todos">Todos los CEDIS</option>
-        <option value="cedis-villahermosa">Villahermosa</option>
-        <option value="cedis-merida">Mérida</option>
-        <option value="cedis-queretaro">Querétaro</option>
-        <option value="cedis-campeche">Campeche</option>
-      </select>
       <button class="btn-logout" id="btn-logout">Salir</button>
     </div>
   </div>
@@ -303,7 +317,7 @@
         <div class="bar-chart" id="chart-pri"></div>
       </div>
       <div class="chart-card">
-        <div class="chart-title">Reportes por CEDIS</div>
+        <div class="chart-title">Reportes por comedor</div>
         <div class="bar-chart" id="chart-cedis"></div>
       </div>
     </div>
@@ -346,7 +360,7 @@
         <thead>
           <tr>
             <th>Folio</th><th>Fecha</th><th>Hora</th>
-            <th>CEDIS</th><th>Comedor</th><th>Categoría</th>
+            <th>Comedor</th><th>Categoría</th>
             <th>Prioridad</th><th>Asociado</th>
             <th>Descripción</th><th>Estatus</th>
           </tr>
@@ -395,13 +409,8 @@
         <h4>Información general</h4>
         <div class="detail-row"><span>Categoría</span><span id="m-cat">—</span></div>
         <div class="detail-row"><span>Prioridad</span><span id="m-pri">—</span></div>
-        <div class="detail-row"><span>CEDIS</span><span id="m-cedis">—</span></div>
         <div class="detail-row"><span>Comedor</span><span id="m-comedor">—</span></div>
         <div class="detail-row"><span>Tipo de reporte</span><span id="m-modo-badge" class="badge badge-gray">—</span></div>
-        <div class="detail-row" id="m-whatsapp-row" style="display:none;">
-          <span>Contacto</span>
-          <a id="m-whatsapp-link" href="#" target="_blank" rel="noopener" class="btn-secondary" style="display:inline-block;width:auto;padding:6px 14px;font-size:.75rem;text-decoration:none;"> Contactar por WhatsApp</a>
-        </div>
         <div class="detail-row"><span>Asociado</span><span id="m-asociado">—</span></div>
         <div class="detail-row"><span>No. Empleado</span><span id="m-empleado">—</span></div>
         <div class="detail-row"><span>Descripción</span><span id="m-desc">—</span></div>
