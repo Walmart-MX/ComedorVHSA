@@ -351,6 +351,8 @@ th{
 td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
 tr:hover td{background:#f7f9fc;}
 .td-folio{font-weight:800;color:var(--blue);cursor:pointer;}
+.btn-ver-reporte{background:none;border:1px solid var(--blue);color:var(--blue);border-radius:6px;padding:4px 10px;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+.btn-ver-reporte:hover{background:var(--blue);color:white;}
 .td-folio:hover{text-decoration:underline;}
 .status-select{
   padding:4px 8px;border:1px solid var(--border);

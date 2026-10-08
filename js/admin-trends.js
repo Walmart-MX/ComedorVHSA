@@ -26,9 +26,9 @@ function renderEvolucionSemanal(r, now) {
     .filter(([, valores]) => valores.reduce((a, b) => a + b, 0) > 0)
     .sort((a, b) => b[1].reduce((x, y) => x + y) - a[1].reduce((x, y) => x + y))
     .forEach(([cat, valores]) => {
-      const tendenciaTexto = valores[3] > valores[0] ? '(subiendo)' : valores[3] < valores[0] ? '(bajando)' : '(estable)';
+      const tendenciaTexto = calcularTendencia(valores);
       const maxS = Math.max(...valores, 1);
-      html += `<div style="margin-bottom:12px;"><div style="font-size:.75rem;font-weight:800;color:var(--text);margin-bottom:6px;">${escapeHtml(CAT_NAMES[cat] || cat)} <span style="font-weight:400;color:var(--text2);">${tendenciaTexto}</span></div>`;
+      html += `<div style="margin-bottom:12px;"><div style="font-size:.75rem;font-weight:800;color:var(--text);margin-bottom:6px;">${escapeHtml(CAT_NAMES[cat] || cat)} <span style="font-weight:400;color:var(--text2);">(${tendenciaTexto})</span></div>`;
       valores.forEach((v, i) => {
         html += `<div class="bar-row"><div class="bar-label" style="width:70px;">${semanas[i]}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v / maxS * 100)}%"></div></div><div class="bar-val">${v}</div></div>`;
       });
@@ -36,6 +36,23 @@ function renderEvolucionSemanal(r, now) {
     });
 
   document.getElementById('chart-semanas').innerHTML = html || '<p style="color:var(--text2);font-size:.8rem;">Sin datos suficientes.</p>';
+}
+
+/** Tendencia simple y transparente (sin IA/ML): compara la ultima semana
+    contra la inmediata anterior, y detecta si la ultima semana es ademas
+    el pico de las ultimas 4. */
+function calcularTendencia(valores) {
+  const [, , anterior, ultima] = valores;
+  const max = Math.max(...valores);
+  if (ultima === anterior) return 'estable';
+  if (ultima > anterior) {
+    const esPico = ultima === max;
+    const saltoGrande = anterior > 0 ? ultima >= anterior * 2 : ultima >= 3;
+    if (esPico && saltoGrande) return 'incremento significativo';
+    if (esPico) return 'pico reciente';
+    return 'subiendo';
+  }
+  return 'bajando';
 }
 
 function renderHorarios(r) {

@@ -41,9 +41,10 @@ export function renderTabla() {
       <td>${escapeHtml(x.nombre || 'Anónimo')}<br><span style="font-size:.68rem;color:var(--text2);">${escapeHtml(x.numero_empleado || '—')}</span></td>
       <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(x.descripcion)}">${escapeHtml(x.descripcion)}</td>
       <td><span class="badge ${STATUS_BADGE[x.estatus]}">${STATUS_LABELS[x.estatus]}</span></td>
+      <td><button type="button" class="btn-ver-reporte" data-id="${x.id}">Ver reporte</button></td>
     </tr>`).join('');
 
-  document.querySelectorAll('.td-folio').forEach(el =>
+  document.querySelectorAll('.td-folio, .btn-ver-reporte').forEach(el =>
     el.addEventListener('click', () => openModal(Number(el.dataset.id))));
 }
 

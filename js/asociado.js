@@ -218,10 +218,10 @@ async function enviarReporte() {
     return;
   }
 
-  mostrarConfirmacion(data[0]);
+  mostrarConfirmacion(data[0], modo);
 }
 
-function mostrarConfirmacion(r) {
+function mostrarConfirmacion(r, modo) {
   document.getElementById('step-2').classList.add('hidden');
   document.getElementById('step-confirm').classList.remove('hidden');
   document.getElementById('c-folio').textContent = r.folio;
@@ -230,12 +230,14 @@ function mostrarConfirmacion(r) {
   document.getElementById('c-fecha').textContent = new Date(r.creado_en).toLocaleString('es-MX');
   document.getElementById('c-estado').textContent = STATUS_PUBLICO[r.estatus] || r.estatus;
 
-  // WhatsApp es un canal complementario: el reporte ya quedo guardado arriba,
-  // independientemente de que este boton se use o no (y de que el numero de
-  // destino este configurado). Ver js/config.js -> WHATSAPP_DESTINO.
+  // Regla fundamental: WhatsApp SOLO para reportes "con mis datos". En modo
+  // anonimo jamas debe ofrecerse -- contradice el concepto de anonimato
+  // (aunque haya un numero de destino configurado). El reporte ya quedo
+  // guardado arriba en cualquier caso; WhatsApp es un canal adicional, nunca
+  // una condicion para registrar.
   const whatsappBtn = document.getElementById('btn-whatsapp-confirmar');
-  if (WHATSAPP_DESTINO) {
-    const resumen = `Reporte de comedor\nFolio: ${r.folio}\nCategoria: ${CAT_NAMES[r.categoria]}\nUbicacion: ${COMEDOR_NAMES[r.comedor] || r.comedor}\nFecha: ${new Date(r.creado_en).toLocaleString('es-MX')}`;
+  if (modo === 'personalizado' && WHATSAPP_DESTINO) {
+    const resumen = `Reporte registrado en el sistema de comedor\nFolio: ${r.folio}\nCategoria: ${CAT_NAMES[r.categoria]}\nComedor: ${COMEDOR_NAMES[r.comedor] || r.comedor}\nFecha: ${new Date(r.creado_en).toLocaleString('es-MX')}`;
     whatsappBtn.href = `https://wa.me/${WHATSAPP_DESTINO}?text=${encodeURIComponent(resumen)}`;
     whatsappBtn.classList.remove('hidden');
   } else {
