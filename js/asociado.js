@@ -1,6 +1,6 @@
 import { supabase, isSupabaseConfigured } from './supabase-client.js';
 import { CAT_NAMES, COMEDOR_NAMES, PRIORIDADES, STATUS_PUBLICO, DEFAULT_CEDIS, escapeHtml } from './catalog.js';
-import { CATEGORY_ICONS } from './icons.js';
+import { CATEGORY_ICONS, CHECK_ICON } from './icons.js';
 import { WHATSAPP_DESTINO } from './config.js';
 
 let currentCat = null;
@@ -10,6 +10,7 @@ let currentFoto = null;
 let asociadoVerificado = null;
 
 export function initAsociado() {
+  document.getElementById('confirm-icon').innerHTML = CHECK_ICON;
   wireCategoryCards();
   wireModoToggle();
   document.getElementById('btn-step2').addEventListener('click', goStep2);

@@ -19,3 +19,11 @@ export const CATEGORY_ICONS = {
   higiene: base('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>'),
   otra: base('<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>')
 };
+
+/* Iconos de UI generales (fuera de las tarjetas de categoria): mismo estilo
+   lineal, sin emojis. Reemplazan los emojis de confirmacion y tendencias. */
+const uiIcon = (inner, size = 22) =>
+  `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
+
+export const CHECK_ICON = uiIcon('<path d="M20 6 9 17l-5-5"/>', 36);
+export const TREND_ICON = uiIcon('<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>', 20);

@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from './supabase-client.js';
 import { CAT_NAMES, COMEDOR_NAMES, escapeHtml } from './catalog.js';
+import { TREND_ICON } from './icons.js';
 
 let cachedReportes = [];
 
@@ -136,6 +137,6 @@ function renderTendenciaAlert(r) {
   }
   box.style.display = 'flex';
   box.innerHTML = `
-    <div class="icon">!</div>
+    <div class="icon">${TREND_ICON}</div>
     <p><strong>Tendencia detectada</strong>Incremento de reportes de <strong>${escapeHtml(CAT_NAMES[peorCat] || peorCat)}</strong> en los últimos 7 días (+${peorIncremento} vs. semana anterior). Se recomienda revisión del área correspondiente.</p>`;
 }

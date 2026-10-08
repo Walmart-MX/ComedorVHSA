@@ -29,7 +29,7 @@
 
     <div style="padding:20px 16px 0;">
       <div class="intro-card">
-        <p>¿Detectaste alguna oportunidad en el servicio de comedor? Ayúdanos a identificarla y mejorar la experiencia de todos.</p>
+        <p>¿Algo no está bien en el comedor? Repórtalo aquí y nos ayuda a corregirlo lo antes posible.</p>
       </div>
 
       <button type="button" id="btn-ir-consulta" class="link-button">¿Ya hiciste un reporte? Consulta su estado aquí</button>
@@ -189,7 +189,7 @@
   <!-- CONFIRMACIÓN -->
   <div id="step-confirm" class="hidden">
     <div class="confirm-wrap">
-      <div class="confirm-icon">✅</div>
+      <div class="confirm-icon" id="confirm-icon"></div>
       <h2>Reporte registrado</h2>
       <p>Gracias por ayudarnos a identificar oportunidades de mejora.</p>
       <div class="folio-box">
@@ -296,8 +296,8 @@
   <!-- DASHBOARD -->
   <div id="tab-dashboard" class="admin-content">
     <!-- Alerta de tendencia -->
-    <div class="trend-alert" id="trend-alert">
-      <div class="icon">📈</div>
+    <div class="trend-alert" id="trend-alert" style="display:none;">
+      <div class="icon" id="trend-alert-icon"></div>
       <p><strong>Tendencia detectada</strong>Incremento de reportes de <strong>Temperatura</strong> en las últimas 3 semanas. Se recomienda revisión del equipo de mantenimiento.</p>
     </div>
     <!-- KPIs -->
@@ -353,7 +353,7 @@
         <option value="atendido">Atendido</option>
         <option value="cerrado">Cerrado</option>
       </select>
-      <button class="btn-export" id="btn-export-csv">⬇️ Exportar CSV</button>
+      <button class="btn-export" id="btn-export-csv">Exportar CSV</button>
     </div>
     <div class="table-wrap">
       <table>
@@ -372,9 +372,9 @@
 
   <!-- TENDENCIAS -->
   <div id="tab-tendencias" class="admin-content hidden">
-    <div class="trend-alert">
-      <div class="icon">🔍</div>
-      <p><strong>Análisis de tendencias — últimas 4 semanas</strong>El sistema detecta incrementos sostenidos en categorías de inocuidad. Revisa el detalle semanal a continuación.</p>
+    <div class="trend-alert" id="trend-alert-tendencias" style="display:none;">
+      <div class="icon" id="trend-alert-tendencias-icon"></div>
+      <p id="trend-alert-tendencias-text"></p>
     </div>
     <div class="charts-grid">
       <div class="chart-card" style="grid-column:1/-1;">

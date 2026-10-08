@@ -211,7 +211,7 @@ button,select,input,textarea{font-family:inherit;}
 .confirm-icon{
   width:72px;height:72px;background:var(--green-bg);
   border-radius:50%;display:flex;align-items:center;
-  justify-content:center;font-size:36px;margin:0 auto 20px;
+  justify-content:center;color:var(--green);margin:0 auto 20px;
 }
 .confirm-wrap h2{font-size:1.3rem;font-weight:900;color:var(--text);margin-bottom:6px;}
 .confirm-wrap p{font-size:.88rem;color:var(--text2);line-height:1.6;}
@@ -320,7 +320,7 @@ button,select,input,textarea{font-family:inherit;}
   border-radius:var(--radius-sm);padding:12px 14px;
   margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;
 }
-.trend-alert .icon{font-size:1.1rem;flex-shrink:0;}
+.trend-alert .icon{color:#92400e;flex-shrink:0;display:flex;align-items:center;}
 .trend-alert p{font-size:.78rem;color:#92400e;line-height:1.5;}
 .trend-alert strong{display:block;margin-bottom:2px;}
 
