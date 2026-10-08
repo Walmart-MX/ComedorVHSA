@@ -128,6 +128,14 @@ function mostrarFotoEnModal(fotoUrl) {
   }
 }
 
+/** Deep link desde una notificacion push de admin (?admin_folio=XXX).
+    Busca en el cache ya cargado -- si el admin apenas inicio sesion,
+    main.js espera a que renderDashboard() llene el cache antes de llamar esto. */
+export function abrirReportePorFolio(folio) {
+  const r = getCachedReportes().find(x => x.folio === folio);
+  if (r) openModal(r.id);
+}
+
 function closeModal() {
   document.getElementById('modal-detalle').classList.add('hidden');
   editingId = null;

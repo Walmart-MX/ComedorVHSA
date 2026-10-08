@@ -24,6 +24,20 @@ function volverInicio() {
 
 async function buscarFolio() {
   const folio = document.getElementById('consulta-folio').value.trim().toUpperCase();
+  await ejecutarConsulta(folio);
+}
+
+/** Entrada para deep links (?folio=XXX en la URL, ver service-worker.js /
+    js/main.js). Lleva al usuario directo a la pantalla de consulta con el
+    folio ya resuelto, sin que tenga que volver a escribirlo. */
+export function consultarFolioDesdeURL(folio) {
+  mostrarConsulta();
+  const input = document.getElementById('consulta-folio');
+  input.value = folio.trim().toUpperCase();
+  ejecutarConsulta(input.value);
+}
+
+async function ejecutarConsulta(folio) {
   const resultado = document.getElementById('consulta-resultado');
   const noEncontrado = document.getElementById('consulta-no-encontrado');
   const cargando = document.getElementById('consulta-cargando');
