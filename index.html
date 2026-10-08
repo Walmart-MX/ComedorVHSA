@@ -218,6 +218,13 @@
       </div>
       <p style="font-size:.78rem;color:var(--text2);max-width:300px;">Guarda tu folio: puedes consultar el avance de tu reporte cuando quieras desde "Consultar mi reporte" en la pantalla principal.</p>
       <a id="btn-whatsapp-confirmar" href="#" target="_blank" rel="noopener" class="btn-secondary hidden" style="max-width:280px;display:block;text-align:center;text-decoration:none;margin-top:10px;">Compartir reporte por WhatsApp</a>
+
+      <div id="push-opt-in" class="hidden" style="max-width:300px;margin-top:14px;padding:12px;background:var(--surface);border-radius:var(--radius-sm);">
+        <p style="font-size:.78rem;color:var(--text2);margin-bottom:8px;">Activa las notificaciones para recibir avisos cuando tu reporte cambie de estado.</p>
+        <button type="button" class="btn-secondary" id="btn-activar-notif-asociado" style="width:auto;padding:6px 14px;font-size:.75rem;">Activar notificaciones</button>
+        <p id="push-opt-in-resultado" class="hidden" style="font-size:.75rem;margin-top:6px;"></p>
+      </div>
+
       <button class="btn-primary" id="btn-nuevo-reporte" style="margin-top:14px;max-width:280px;">Hacer otro reporte</button>
     </div>
   </div>
@@ -297,6 +304,7 @@
   <div class="admin-header-bar">
     <h1>Reportes Comedor</h1>
     <div class="right">
+      <button class="btn-export" id="btn-activar-notif-admin" style="display:none;">Activar notificaciones</button>
       <button class="btn-logout" id="btn-logout">Salir</button>
     </div>
   </div>

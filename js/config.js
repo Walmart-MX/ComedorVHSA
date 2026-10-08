@@ -13,3 +13,9 @@ export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
    quede vacio, el boton de WhatsApp de la confirmacion permanece oculto
    (no inventamos un numero -- ver conversacion con el cliente). */
 export const WHATSAPP_DESTINO = '';
+
+/* Llave publica VAPID para suscripciones push (Web Push API). Generada
+   junto con su contraparte privada (que NUNCA va aqui, solo vive como
+   secret en la Edge Function). Mientras quede vacia, js/push.js se
+   desactiva solo -- no rompe nada, simplemente no ofrece notificaciones. */
+export const VAPID_PUBLIC_KEY = '';

@@ -7,6 +7,7 @@ import { renderDashboard } from './admin-dashboard.js';
 import { initAdminTable, renderTabla, abrirReportePorFolio } from './admin-table.js';
 import { renderTendencias } from './admin-trends.js';
 import { initPWA } from './pwa.js';
+import { activarNotificacionesAdmin, pushDisponible } from './push.js';
 
 if (!isSupabaseConfigured) {
   document.getElementById('backend-warning')?.classList.remove('hidden');
@@ -34,6 +35,22 @@ function onAdminLogin() {
       folioAdminPendiente = null;
     }
   });
+  wireNotificacionesAdmin();
+}
+
+function wireNotificacionesAdmin() {
+  const btn = document.getElementById('btn-activar-notif-admin');
+  if (!btn || !pushDisponible()) return;
+  btn.style.display = 'inline-block';
+  btn.addEventListener('click', () => {
+    btn.disabled = true;
+    btn.textContent = 'Activando...';
+    activarNotificacionesAdmin((ok) => {
+      btn.disabled = false;
+      btn.textContent = ok ? 'Notificaciones activadas' : 'Activar notificaciones';
+      if (ok) btn.disabled = true;
+    });
+  }, { once: true });
 }
 
 async function refrescarTodo() {

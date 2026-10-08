@@ -2,6 +2,7 @@ import { supabase, isSupabaseConfigured } from './supabase-client.js';
 import { CAT_NAMES, COMEDOR_NAMES, PRIORIDADES, STATUS_PUBLICO, DEFAULT_CEDIS, escapeHtml } from './catalog.js';
 import { CATEGORY_ICONS, CHECK_ICON } from './icons.js';
 import { WHATSAPP_DESTINO } from './config.js';
+import { activarNotificacionesAsociado, pushDisponible } from './push.js';
 
 let currentCat = null;
 let currentFoto = null;
@@ -244,6 +245,42 @@ function mostrarConfirmacion(r, modo) {
   } else {
     whatsappBtn.classList.add('hidden');
   }
+
+  mostrarOpcionNotificaciones(modo);
+}
+
+/** Ofrece notificaciones SOLO en modo personalizado, y SOLO si el
+    navegador/VAPID lo soportan -- nunca en modo anonimo (regla fundamental). */
+function mostrarOpcionNotificaciones(modo) {
+  const box = document.getElementById('push-opt-in');
+  if (modo !== 'personalizado' || !pushDisponible() || !asociadoVerificado) {
+    box.classList.add('hidden');
+    return;
+  }
+  box.classList.remove('hidden');
+  const btn = document.getElementById('btn-activar-notif-asociado');
+  const resultado = document.getElementById('push-opt-in-resultado');
+  const numero = asociadoVerificado.numero_empleado;
+
+  const handler = () => {
+    btn.disabled = true;
+    btn.textContent = 'Activando...';
+    activarNotificacionesAsociado(numero, (ok, motivo) => {
+      btn.disabled = false;
+      resultado.classList.remove('hidden');
+      if (ok) {
+        btn.classList.add('hidden');
+        resultado.textContent = 'Notificaciones activadas.';
+      } else {
+        btn.textContent = 'Activar notificaciones';
+        resultado.textContent = motivo === 'denegado'
+          ? 'No diste permiso de notificaciones. Puedes seguir consultando tu folio manualmente.'
+          : 'No se pudo activar en este momento.';
+      }
+    });
+  };
+  btn.replaceWith(btn.cloneNode(true)); // evita listeners duplicados entre reportes
+  document.getElementById('btn-activar-notif-asociado').addEventListener('click', handler);
 }
 
 function copiarFolio() {
