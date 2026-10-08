@@ -66,8 +66,10 @@ Una vez tengamos `js/config.js` lleno, hacemos push y activo Pages
 
 ## Decisiones de diseño (vs. el prototipo original)
 
-- **Folios sin colisión**: generados por un trigger de Postgres
-  (`reportes_folio_seq`), no por un contador en `localStorage` del navegador.
+- **Folios sin colisión y no adivinables**: generados por un trigger de
+  Postgres con un código aleatorio (no un contador consecutivo ni un
+  `localStorage` del navegador), para que la consulta pública por folio no
+  se pueda usar para "recorrer" y leer reportes ajenos.
 - **Historial automático**: triggers en la base de datos registran cada
   cambio de estatus, así nunca se pierde un paso aunque alguien edite la
   tabla directo en SQL.
