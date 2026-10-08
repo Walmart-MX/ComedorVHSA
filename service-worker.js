@@ -44,7 +44,14 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => cache.addAll(SHELL_ASSETS))
     // OJO: sin self.skipWaiting() aqui a proposito. El SW nuevo se queda
-    //
+    // "esperando" hasta que el usuario confirme el banner de actualizacion
+    // (ver js/pwa.js) -- asi no le cambiamos el tapete a medio reporte.
+  );
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
+});
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
