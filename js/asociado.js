@@ -113,18 +113,39 @@ function removeFoto() {
   document.getElementById('btn-remove-foto').classList.add('hidden');
 }
 
-/** Sube la evidencia a Supabase Storage y regresa la URL pública (o null si no hay foto). */
+/** Evita que una llamada de red colgada deje el formulario congelado para
+    siempre -- el fetch del navegador NO tiene timeout por defecto, asi que
+    sin esto, un problema de red/CORS en Storage o en el RPC deja el boton
+    "Enviando..." deshabilitado de por vida (hallazgo real en pruebas). */
+function conTimeout(promesa, ms, mensaje) {
+  return Promise.race([
+    promesa,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(mensaje)), ms))
+  ]);
+}
+
+/** Sube la evidencia a Supabase Storage y regresa la URL pública (o null si no hay foto,
+    o si la subida falla/se cuelga -- una foto que no sube nunca debe bloquear el reporte). */
 async function subirFoto() {
   if (!currentFoto) return null;
-  const ext = currentFoto.name.split('.').pop() || 'jpg';
-  const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const { error } = await supabase.storage.from('evidencias').upload(path, currentFoto);
-  if (error) {
-    console.error('No se pudo subir la foto:', error.message);
+  try {
+    const ext = currentFoto.name.split('.').pop() || 'jpg';
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error } = await conTimeout(
+      supabase.storage.from('evidencias').upload(path, currentFoto),
+      15000,
+      'La subida de la foto tardó demasiado.'
+    );
+    if (error) {
+      console.error('No se pudo subir la foto:', error.message);
+      return null;
+    }
+    const { data } = supabase.storage.from('evidencias').getPublicUrl(path);
+    return data.publicUrl;
+  } catch (err) {
+    console.error('No se pudo subir la foto:', err.message || err);
     return null;
   }
-  const { data } = supabase.storage.from('evidencias').getPublicUrl(path);
-  return data.publicUrl;
 }
 
 /** Busca al asociado por numero de empleado. La base solo tiene numero,
@@ -193,40 +214,56 @@ async function enviarReporte() {
   btn.disabled = true;
   btn.textContent = 'Enviando...';
 
-  const foto_url = await subirFoto();
+  // Blindaje general: CUALQUIER falla inesperada de aqui en adelante (red
+  // caida, timeout, error de Supabase) cae en el catch de abajo y el
+  // finally reactiva el boton -- antes un error sin capturar en cualquiera
+  // de estos pasos (incluyendo un fetch colgado sin timeout) dejaba el
+  // boton trabado en "Enviando..." para siempre (hallazgo real reportado).
+  try {
+    const foto_url = await subirFoto();
 
-  // RPC en vez de insert().select() directo: el rol anon puede INSERTAR pero
-  // a proposito no puede LEER la tabla reportes en general (nadie sin login
-  // deberia poder listar todos los reportes via la API). El RPC corre con
-  // privilegios elevados y solo regresa los campos que esta pantalla necesita.
-  const { data, error } = await supabase.rpc('crear_reporte', {
-    p_categoria: currentCat,
-    p_cedis: DEFAULT_CEDIS,
-    p_comedor: comedor,
-    p_nombre: nombre,
-    p_numero_empleado: numero_empleado,
-    p_descripcion: descripcion,
-    p_prioridad: PRIORIDADES[currentCat],
-    p_foto_url: foto_url,
-    p_modo_reporte: modo
-  });
+    // RPC en vez de insert().select() directo: el rol anon puede INSERTAR pero
+    // a proposito no puede LEER la tabla reportes en general (nadie sin login
+    // deberia poder listar todos los reportes via la API). El RPC corre con
+    // privilegios elevados y solo regresa los campos que esta pantalla necesita.
+    const { data, error } = await conTimeout(
+      supabase.rpc('crear_reporte', {
+        p_categoria: currentCat,
+        p_cedis: DEFAULT_CEDIS,
+        p_comedor: comedor,
+        p_nombre: nombre,
+        p_numero_empleado: numero_empleado,
+        p_descripcion: descripcion,
+        p_prioridad: PRIORIDADES[currentCat],
+        p_foto_url: foto_url,
+        p_modo_reporte: modo
+      }),
+      20000,
+      'El envío del reporte tardó demasiado.'
+    );
 
-  btn.disabled = false;
-  btn.textContent = 'Enviar reporte';
+    if (error) throw error;
 
-  if (error) {
-    console.error(error);
+    // Se vuelve a pedir la configuracion (en vez de confiar en el cache que
+    // cargo main.js al arrancar la pagina, sin esperarlo): si esa carga
+    // inicial todavia no terminaba quedaba un numero vacio en memoria y el
+    // boton de WhatsApp nunca aparecia aunque el admin ya lo hubiera
+    // configurado (hallazgo real reportado en pruebas). Si esto falla o
+    // tarda, NO debe bloquear la confirmacion -- el reporte ya se guardo.
+    try {
+      await conTimeout(cargarConfiguracion(), 4000, 'configuracion lenta');
+    } catch (err) {
+      console.error('No se pudo refrescar la configuración de WhatsApp:', err.message || err);
+    }
+
+    mostrarConfirmacion(data[0], modo);
+  } catch (err) {
+    console.error(err);
     alert('No pudimos guardar tu reporte. Revisa tu conexión e intenta de nuevo.');
-    return;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Enviar reporte';
   }
-
-  // Se vuelve a pedir la configuracion (en vez de confiar en el cache que
-  // cargo main.js al arrancar la pagina, sin esperarlo): si esa carga
-  // inicial todavia no terminaba quedaba un numero vacio en memoria y el
-  // boton de WhatsApp nunca aparecia aunque el admin ya lo hubiera
-  // configurado (hallazgo real reportado en pruebas).
-  await cargarConfiguracion();
-  mostrarConfirmacion(data[0], modo);
 }
 
 function mostrarConfirmacion(r, modo) {
