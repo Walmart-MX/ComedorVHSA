@@ -15,7 +15,7 @@
      sincronizacion en segundo plano).
 ═══════════════════════════════════════════════════════════════ */
 
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const CACHE_NAME = `comedor-shell-${CACHE_VERSION}`;
 
 const SHELL_ASSETS = [
@@ -74,7 +74,13 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(req)
         .then((res) => {
-          caches.open(CACHE_NAME).then((c) => c.put(req, res.clone()));
+          // OJO: clone() tiene que llamarse AQUI, sincrono, apenas llega la
+          // respuesta -- si se llama dentro del .then() de caches.open()
+          // (async), el cuerpo de "res" ya pudo haber empezado a leerse en
+          // el "return res" de abajo, y clone() truena con "Response body
+          // is already used" (hallazgo real en consola del navegador).
+          const resClone = res.clone();
+          caches.open(CACHE_NAME).then((c) => c.put(req, resClone));
           return res;
         })
         .catch(() => caches.match('./index.html'))
@@ -85,7 +91,8 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(req).then((cached) => {
       const fresh = fetch(req).then((res) => {
-        caches.open(CACHE_NAME).then((c) => c.put(req, res.clone()));
+        const resClone = res.clone();
+        caches.open(CACHE_NAME).then((c) => c.put(req, resClone));
         return res;
       }).catch(() => cached);
       return cached || fresh;
