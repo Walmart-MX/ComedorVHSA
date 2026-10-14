@@ -1,7 +1,7 @@
 import { supabase, isSupabaseConfigured } from './supabase-client.js';
 import { CAT_NAMES, COMEDOR_NAMES, PRIORIDADES, STATUS_PUBLICO, DEFAULT_CEDIS, escapeHtml } from './catalog.js';
 import { CATEGORY_ICONS, CHECK_ICON } from './icons.js';
-import { WHATSAPP_DESTINO } from './config.js';
+import { getWhatsappDestino } from './app-config.js';
 import { activarNotificacionesAsociado, pushDisponible } from './push.js';
 
 let currentCat = null;
@@ -238,9 +238,10 @@ function mostrarConfirmacion(r, modo) {
   // guardado arriba en cualquier caso; WhatsApp es un canal adicional, nunca
   // una condicion para registrar.
   const whatsappBtn = document.getElementById('btn-whatsapp-confirmar');
-  if (modo === 'personalizado' && WHATSAPP_DESTINO) {
+  const whatsappDestino = getWhatsappDestino();
+  if (modo === 'personalizado' && whatsappDestino) {
     const resumen = `Reporte registrado en el sistema de comedor\nFolio: ${r.folio}\nCategoria: ${CAT_NAMES[r.categoria]}\nComedor: ${COMEDOR_NAMES[r.comedor] || r.comedor}\nFecha: ${new Date(r.creado_en).toLocaleString('es-MX')}`;
-    whatsappBtn.href = `https://wa.me/${WHATSAPP_DESTINO}?text=${encodeURIComponent(resumen)}`;
+    whatsappBtn.href = `https://wa.me/${whatsappDestino}?text=${encodeURIComponent(resumen)}`;
     whatsappBtn.classList.remove('hidden');
   } else {
     whatsappBtn.classList.add('hidden');

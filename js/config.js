@@ -7,12 +7,12 @@
 export const SUPABASE_URL = 'https://switfyozjhfceqysvcji.supabase.co';
 export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3aXRmeW96amhmY2VxeXN2Y2ppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMDAxODQsImV4cCI6MjEwNjg3NjE4NH0.0VlMLBYw7zSHOiSuECXp3JmoeRMcAwE90p198f8VfJg';
 
-/* Numero de WhatsApp (de la empresa/comedor) al que se dirige el mensaje de
-   confirmacion precargado despues de enviar un reporte. Formato: solo
-   digitos, con codigo de pais (ej. 529931234567 para Mexico). Mientras
-   quede vacio, el boton de WhatsApp de la confirmacion permanece oculto
-   (no inventamos un numero -- ver conversacion con el cliente). */
-export const WHATSAPP_DESTINO = '';
+/* El numero de WhatsApp destino YA NO vive aqui: es un dato operativo que
+   cambia con el tiempo (vacaciones, cambio de responsable, etc.), asi que
+   se movio a la base de datos (tabla app_config) y se edita desde la
+   pestaña "Configuración" del panel admin -- ver js/app-config.js. Tenerlo
+   en un archivo de codigo fuente obligaba a un developer + un redeploy
+   solo para cambiar un numero de telefono. */
 
 /* Llave publica VAPID para suscripciones push (Web Push API). Generada
    junto con su contraparte privada (que NUNCA va aqui, solo vive como

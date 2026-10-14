@@ -10,10 +10,19 @@ con **Supabase** como backend (Postgres + Auth + Storage).
 ## Estado del proyecto
 
 - [x] Esquema de base de datos (`supabase/migrations/`)
-- [x] Frontend reescrito en módulos (sin `localStorage`, sin credenciales
-      hardcodeadas, con RLS real)
-- [ ] Proyecto de Supabase creado y enlazado (pendiente: ver abajo)
-- [ ] Primer usuario admin creado en Supabase Auth
+- [x] Frontend reescrito en módulos (sin `localStorage` de datos de negocio,
+      sin credenciales hardcodeadas, con RLS real)
+- [x] Proyecto de Supabase creado y enlazado (`js/config.js` tiene la URL
+      y anon key reales)
+- [ ] Primer usuario admin creado en Supabase Auth (confirmar en
+      Authentication > Users del dashboard de Supabase)
+- [ ] Secret `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY` configurado en la Edge
+      Function `notificar-push` (sin esto, push queda desactivado solo,
+      no rompe nada -- ver js/push.js)
+- [ ] Trigger `trg_notificar_push` aplicado con la Service Role Key real
+      (ver advertencia en `20261008130100_trigger_notificar_push.sql`:
+      el archivo en el repo trae un placeholder a propósito, se corre a
+      mano en el SQL Editor con la llave real)
 - [ ] GitHub Pages activado
 
 ## Estructura
@@ -25,11 +34,13 @@ js/
   config.js              URL + anon key de Supabase (público, seguro de exponer)
   supabase-client.js      Cliente de Supabase (ESM, vía esm.sh)
   catalog.js              Catálogos centralizados (categorías, CEDIS, prioridades...)
+  app-config.js           Configuración editable desde el admin (hoy: número de WhatsApp)
   auth.js                 Login/logout del panel admin (Supabase Auth)
-  asociado.js             Flujo de reporte del asociado
+  asociado.js              Flujo de reporte del asociado
   admin-dashboard.js       KPIs y gráficas del dashboard
   admin-table.js          Tabla de reportes, filtros, CSV, modal de gestión
   admin-trends.js         Pestaña de tendencias
+  admin-config.js         Pestaña "Configuración" (edita el número de WhatsApp)
   qr.js                   Generación del QR para imprimir en el comedor
   main.js                 Punto de entrada, conecta todo lo anterior
 supabase/
@@ -86,3 +97,13 @@ Una vez tengamos `js/config.js` lleno, hacemos push y activo Pages
   (antes solo funcionaban con clic/touch).
 - **Tiempo de atención real**: se calcula de las fechas reales de los
   reportes, ya no con `Math.random()` como en el prototipo original.
+- **WhatsApp configurable sin tocar código**: el número de destino vive en
+  la base de datos (tabla `app_config`) y se edita desde la pestaña
+  "Configuración" del panel admin. Antes estaba hardcodeado en
+  `js/config.js`: cambiarlo exigía un developer y un redeploy completo.
+- **Instalación de la app (PWA)**: banner inferior visible e inequívoco
+  ("Instalar app"), en vez de un botón circular escondido en una esquina
+  que casi nadie notaba.
+- **Acceso admin discreto**: ya no es un botón flotante siempre visible
+  encima del contenido del asociado -- es un link de pie de página, sin
+  perder accesibilidad (sin trucos de opacidad que violen contraste WCAG).

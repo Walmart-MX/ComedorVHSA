@@ -6,6 +6,8 @@ import { isSupabaseConfigured } from './supabase-client.js';
 import { renderDashboard } from './admin-dashboard.js';
 import { initAdminTable, renderTabla, abrirReportePorFolio } from './admin-table.js';
 import { renderTendencias } from './admin-trends.js';
+import { initAdminConfig, renderConfigTab } from './admin-config.js';
+import { cargarConfiguracion } from './app-config.js';
 import { initPWA } from './pwa.js';
 import { activarNotificacionesAdmin, pushDisponible } from './push.js';
 
@@ -13,10 +15,12 @@ if (!isSupabaseConfigured) {
   document.getElementById('backend-warning')?.classList.remove('hidden');
 }
 
+cargarConfiguracion();
 initAsociado();
 initConsulta();
 initQR();
 initAdminTable();
+initAdminConfig();
 initAuth({ onLogin: onAdminLogin });
 initPWA();
 manejarDeepLink();
@@ -79,9 +83,10 @@ function manejarDeepLink() {
 function showAdminTab(name, el) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  ['dashboard', 'reportes', 'tendencias'].forEach(t => {
+  ['dashboard', 'reportes', 'tendencias', 'config'].forEach(t => {
     document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
   });
   if (name === 'reportes') renderTabla();
   if (name === 'tendencias') renderTendencias();
+  if (name === 'config') renderConfigTab();
 }

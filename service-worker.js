@@ -15,7 +15,7 @@
      sincronizacion en segundo plano).
 ═══════════════════════════════════════════════════════════════ */
 
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const CACHE_NAME = `comedor-shell-${CACHE_VERSION}`;
 
 const SHELL_ASSETS = [
@@ -35,6 +35,8 @@ const SHELL_ASSETS = [
   './js/admin-dashboard.js',
   './js/admin-table.js',
   './js/admin-trends.js',
+  './js/admin-config.js',
+  './js/app-config.js',
   './js/pwa.js',
   './js/push.js'
 ];

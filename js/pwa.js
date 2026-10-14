@@ -6,6 +6,7 @@
 ═══════════════════════════════════════════════════════════════ */
 
 let deferredInstallPrompt = null;
+const DISMISS_KEY = 'comedor_pwa_install_dismissed';
 
 export function initPWA() {
   registrarServiceWorker();
@@ -50,27 +51,49 @@ function mostrarBannerActualizacion(reg) {
 }
 
 function wireInstallPrompt() {
-  const btn = document.getElementById('btn-instalar-app');
-  if (!btn) return;
+  const banner = document.getElementById('pwa-install-banner');
+  const btnInstalar = document.getElementById('btn-pwa-instalar');
+  const btnCerrar = document.getElementById('btn-pwa-instalar-cerrar');
+  if (!banner || !btnInstalar || !btnCerrar) return;
+
+  // Ya instalada (se abrio como app standalone) o el usuario ya cerro el
+  // aviso antes: no insistimos. localStorage aqui es solo una preferencia
+  // de UI efimera (no son datos de reportes), no choca con la decision de
+  // "sin localStorage" del README -- esa aplicaba a folios/datos de negocio.
+  const yaInstalada = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (yaInstalada || fueDescartado()) return;
 
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredInstallPrompt = e;
-    btn.classList.remove('hidden');
+    banner.classList.remove('hidden');
   });
 
-  btn.addEventListener('click', async () => {
+  btnInstalar.addEventListener('click', async () => {
     if (!deferredInstallPrompt) return;
-    btn.classList.add('hidden');
+    banner.classList.add('hidden');
     deferredInstallPrompt.prompt();
     await deferredInstallPrompt.userChoice;
     deferredInstallPrompt = null;
   });
 
+  btnCerrar.addEventListener('click', () => {
+    banner.classList.add('hidden');
+    marcarDescartado();
+  });
+
   window.addEventListener('appinstalled', () => {
-    btn.classList.add('hidden');
+    banner.classList.add('hidden');
     deferredInstallPrompt = null;
   });
+}
+
+function fueDescartado() {
+  try { return localStorage.getItem(DISMISS_KEY) === '1'; } catch { return false; }
+}
+
+function marcarDescartado() {
+  try { localStorage.setItem(DISMISS_KEY, '1'); } catch { /* sin storage disponible: no pasa nada, solo insistira de nuevo */ }
 }
 
 function wireOfflineBanner() {
