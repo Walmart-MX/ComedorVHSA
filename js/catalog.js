@@ -32,7 +32,7 @@ export const COMEDOR_NAMES = {
 
 export const MODO_REPORTE_LABELS = {
   anonimo: 'Anónimo',
-  personalizado: 'Personalizado (WhatsApp)'
+  personalizado: 'Con datos del asociado'
 };
 
 export const PRI_LABELS = { alta: 'Alta', media: 'Media', baja: 'Baja' };
@@ -61,6 +61,21 @@ export const STATUS_PUBLICO = {
 // (ver CEDIS_NAMES) para no cerrar la puerta a futuro, pero la interfaz
 // publica ya no pide elegir CEDIS -- se usa este valor fijo.
 export const DEFAULT_CEDIS = 'cedis-villahermosa';
+
+/** Fecha YYYY-MM-DD en la zona horaria LOCAL del navegador -- usar siempre
+    que se necesite saber "a que dia calendario pertenece" un timestamp
+    (KPI "reportes hoy", grafica de ultimos 7 dias, agrupaciones, etc).
+    NUNCA usar date.toISOString().split('T')[0] para esto: toISOString()
+    es UTC, y en un CEDIS en UTC-6 eso desfasa el dia hasta por 6 horas
+    alrededor de la medianoche local (p. ej. un reporte de las 23:00 local
+    ya cuenta como "manana" en UTC). */
+export function fechaLocalISO(date) {
+  const d = new Date(date);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const dia = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${dia}`;
+}
 
 /** Escapa texto generado por usuarios antes de insertarlo en innerHTML (anti-XSS). */
 export function escapeHtml(str) {

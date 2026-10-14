@@ -1,8 +1,9 @@
-# Comedor VHSA — Reportes de Oportunidades
+# Comedor VHSA — Reportes del Comedor
 
-App para que los asociados reporten oportunidades de mejora en el servicio
-de comedor de los CEDIS de Walmart México (temperatura, calidad, limpieza,
-tiempo de espera, etc.), con un panel administrativo para dar seguimiento.
+App para que los asociados reporten situaciones del servicio de comedor de
+los CEDIS de Walmart México (temperatura, calidad, limpieza, tiempo de
+espera, etc.), con un panel de gestión de reportes del comedor para dar
+seguimiento.
 
 Stack: HTML + CSS + JS vanilla (sin build step) hospedado en **GitHub Pages**,
 con **Supabase** como backend (Postgres + Auth + Storage).

@@ -56,7 +56,7 @@ async function guardarWhatsapp() {
   }
   mostrarMensaje(
     numero
-      ? 'Número guardado. El botón de WhatsApp ya está activo para reportes "con mis datos".'
+      ? 'Número guardado. El botón de WhatsApp ya está activo para reportes "con mis datos de asociado".'
       : 'Número eliminado. El botón de WhatsApp quedará oculto hasta configurar uno nuevo.',
     'ok'
   );

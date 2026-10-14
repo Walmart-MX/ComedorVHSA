@@ -18,4 +18,4 @@ export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
    junto con su contraparte privada (que NUNCA va aqui, solo vive como
    secret en la Edge Function). Mientras quede vacia, js/push.js se
    desactiva solo -- no rompe nada, simplemente no ofrece notificaciones. */
-export const VAPID_PUBLIC_KEY = '';
+export const VAPID_PUBLIC_KEY = 'BMr8BnP3n2PG9kfJCt0uQkRTzE2MbkIL-E0vYHVI0LTCHsHm2zEnZwKqL91TpOxfYxtdOfdSmPJ9x59x3xvZI5A';

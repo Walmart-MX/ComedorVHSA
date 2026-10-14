@@ -37,9 +37,9 @@ const supabaseAdmin = createClient(
 );
 
 const CAT_NAMES: Record<string, string> = {
-  temperatura: "Temperatura", calidad: "Calidad de alimento", coccion: "Cocción",
+  temperatura: "Temperatura", calidad: "Calidad y frescura", coccion: "Cocción",
   porcion: "Porción", objeto: "Objeto extraño", limpieza: "Limpieza",
-  espera: "Tiempo de espera", atencion: "Atención del personal",
+  espera: "Tiempo de espera", atencion: "Atención",
   higiene: "Higiene", otra: "Otra incidencia"
 };
 const COMEDOR_NAMES: Record<string, string> = { secos: "Comedor Secos", perecederos: "Comedor Perecederos" };

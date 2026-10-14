@@ -100,7 +100,7 @@ self.addEventListener('push', (event) => {
   let payload = {};
   try { payload = event.data ? event.data.json() : {}; } catch { payload = {}; }
 
-  const title = payload.title || 'Reportes Comedor';
+  const title = payload.title || 'Reportes del Comedor';
   const options = {
     body: payload.body || '',
     icon: './icons/icon.svg',

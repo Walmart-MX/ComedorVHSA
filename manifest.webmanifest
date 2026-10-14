@@ -1,6 +1,6 @@
 {
-  "name": "Reportes Comedor - Walmart CEDIS Villahermosa",
-  "short_name": "Reportes Comedor",
+  "name": "Reportes del Comedor - Walmart CEDIS Villahermosa",
+  "short_name": "Reportes del Comedor",
   "description": "Reporta y da seguimiento a situaciones del comedor del CEDIS Walmart Villahermosa (Perecederos y Secos).",
   "start_url": "./index.html",
   "scope": "./",

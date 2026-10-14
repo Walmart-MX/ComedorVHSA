@@ -1,7 +1,7 @@
 import { supabase, isSupabaseConfigured } from './supabase-client.js';
 import { CAT_NAMES, COMEDOR_NAMES, PRIORIDADES, STATUS_PUBLICO, DEFAULT_CEDIS, escapeHtml } from './catalog.js';
 import { CATEGORY_ICONS, CHECK_ICON } from './icons.js';
-import { getWhatsappDestino } from './app-config.js';
+import { getWhatsappDestino, cargarConfiguracion } from './app-config.js';
 import { activarNotificacionesAsociado, pushDisponible } from './push.js';
 
 let currentCat = null;
@@ -67,7 +67,7 @@ function actualizarVisibilidadModo() {
   document.getElementById('campos-personalizados').classList.toggle('hidden', !esPersonalizado);
   document.getElementById('modo-hint').textContent = esPersonalizado
     ? 'Podremos identificarte para dar seguimiento a tu reporte.'
-    : 'No se asociara tu reporte con tus datos personales.';
+    : 'Tu reporte no quedará asociado a tus datos personales en el sistema.';
   if (!esPersonalizado) {
     asociadoVerificado = null;
     document.getElementById('asociado-resultado').classList.add('hidden');
@@ -220,6 +220,12 @@ async function enviarReporte() {
     return;
   }
 
+  // Se vuelve a pedir la configuracion (en vez de confiar en el cache que
+  // cargo main.js al arrancar la pagina, sin esperarlo): si esa carga
+  // inicial todavia no terminaba quedaba un numero vacio en memoria y el
+  // boton de WhatsApp nunca aparecia aunque el admin ya lo hubiera
+  // configurado (hallazgo real reportado en pruebas).
+  await cargarConfiguracion();
   mostrarConfirmacion(data[0], modo);
 }
 

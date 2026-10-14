@@ -65,7 +65,7 @@ async function ejecutarConsulta(folio) {
   btn.disabled = false;
 
   if (error || !data || data.length === 0) {
-    noEncontrado.textContent = 'No encontramos un reporte con ese folio. Verifica que esté completo y sin espacios.';
+    noEncontrado.textContent = 'No encontramos un reporte con ese folio. Verifica que lo hayas ingresado correctamente e inténtalo de nuevo.';
     noEncontrado.classList.remove('hidden');
     return;
   }

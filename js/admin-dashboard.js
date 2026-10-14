@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase-client.js';
-import { CAT_NAMES, COMEDOR_NAMES, escapeHtml } from './catalog.js';
+import { CAT_NAMES, COMEDOR_NAMES, fechaLocalISO, escapeHtml } from './catalog.js';
 import { TREND_ICON } from './icons.js';
 
 let cachedReportes = [];
@@ -25,11 +25,10 @@ export async function cargarReportes() {
 
 export async function renderDashboard() {
   const r = await cargarReportes();
-  const hoy = new Date().toISOString().split('T')[0];
-  const fechaDe = (x) => x.creado_en.split('T')[0];
-  const hoyISO = new Date().toISOString().split('T')[0];
+  const hoy = fechaLocalISO(new Date());
+  const fechaDe = (x) => fechaLocalISO(x.creado_en);
   const vencidos = r.filter(x =>
-    x.fecha_compromiso && x.fecha_compromiso < hoyISO &&
+    x.fecha_compromiso && x.fecha_compromiso < hoy &&
     x.estatus !== 'atendido' && x.estatus !== 'cerrado'
   ).length;
 
@@ -41,7 +40,7 @@ export async function renderDashboard() {
     { n: r.filter(x => x.estatus === 'atendido').length, l: 'Atendidos', c: 'green' },
     { n: r.filter(x => x.estatus === 'cerrado').length, l: 'Cerrados', c: '' },
     { n: vencidos, l: 'Vencidos', c: vencidos > 0 ? 'red' : '' },
-    { n: tiempoPromedioGlobal(r), l: 'Tiempo prom. atención (días)', c: '' }
+    { n: tiempoPromedioGlobal(r), l: 'Tiempo promedio de atención (días)', c: '' }
   ];
   document.getElementById('kpi-grid').innerHTML = kpis.map(k =>
     `<div class="kpi-card ${k.c}"><div class="kpi-num">${escapeHtml(k.n)}</div><div class="kpi-label">${escapeHtml(k.l)}</div></div>`
@@ -83,12 +82,12 @@ function ultimosDias(lista) {
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    dias.push(d.toISOString().split('T')[0]);
+    dias.push(fechaLocalISO(d));
   }
   const conteo = {};
   dias.forEach(d => { conteo[d] = 0; });
   lista.forEach(x => {
-    const f = x.creado_en.split('T')[0];
+    const f = fechaLocalISO(x.creado_en);
     if (conteo[f] !== undefined) conteo[f]++;
   });
   return dias.map(d => ({

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Reportes Comedor - Walmart CEDIS</title>
+<title>Reportes del Comedor - Walmart CEDIS</title>
 <meta name="theme-color" content="#0071CE">
 <meta name="description" content="Reporta y da seguimiento a situaciones del comedor del CEDIS Walmart Villahermosa.">
 <link rel="manifest" href="manifest.webmanifest">
@@ -36,23 +36,23 @@
 <div id="app-asociado">
 
   <div id="backend-warning" class="hidden" style="background:#fff3cd;color:#664d03;padding:10px 16px;text-align:center;font-size:.78rem;font-weight:700;">
-    Backend en configuracion - los reportes no se pueden enviar todavia.
+    El sistema está en configuración: por ahora no es posible enviar reportes.
   </div>
 
   <!-- PASO 1: CATEGORÍA -->
   <div id="step-1">
     <div class="aso-header">
       <div class="aso-logo">🍽️</div>
-      <h1>Reporte de Oportunidades</h1>
+      <h1>Reportes del Comedor</h1>
       <p>Comedor — CEDIS Walmart Villahermosa</p>
     </div>
 
     <div style="padding:20px 16px 0;">
       <div class="intro-card">
-        <p>¿Algo no está bien en el comedor? Repórtalo aquí y nos ayuda a corregirlo lo antes posible.</p>
+        <p>¿Detectaste alguna situación en el comedor? Repórtala aquí para que podamos revisarla y darle seguimiento.</p>
       </div>
 
-      <button type="button" id="btn-ir-consulta" class="link-button">¿Ya hiciste un reporte? Consulta su estado aquí</button>
+      <button type="button" id="btn-ir-consulta" class="link-button">¿Ya registraste un reporte? Consulta su seguimiento aquí</button>
 
       <div class="step-bar">
         <div class="step-dot active" id="sd1">1</div>
@@ -63,7 +63,7 @@
         <span class="step-label">Categoría → Datos → Listo</span>
       </div>
 
-      <div class="step-title">Selecciona la categoría</div>
+      <div class="step-title">¿Qué situación deseas reportar?</div>
       <div class="cat-grid">
         <div class="cat-card" role="button" tabindex="0" data-cat="temperatura">
           <span class="cat-name">Temperatura</span>
@@ -79,7 +79,7 @@
         </div>
         <div class="cat-card" role="button" tabindex="0" data-cat="porcion">
           <span class="cat-name">Porción</span>
-          <span class="cat-desc">Cantidad insuficiente o excesiva servida</span>
+          <span class="cat-desc">Se sirvió una cantidad insuficiente o excesiva</span>
         </div>
         <div class="cat-card" role="button" tabindex="0" data-cat="objeto">
           <span class="cat-name">Objeto extraño</span>
@@ -103,7 +103,7 @@
         </div>
         <div class="cat-card" role="button" tabindex="0" data-cat="otra">
           <span class="cat-name">Otra incidencia</span>
-          <span class="cat-desc">Cualquier otra oportunidad de mejora</span>
+          <span class="cat-desc">Cualquier otra situación que no esté en las categorías anteriores</span>
         </div>
       </div>
 
@@ -119,7 +119,7 @@
   <div id="step-2" class="hidden">
     <div class="aso-header">
       <div class="aso-logo">🍽️</div>
-      <h1>Reporte de Oportunidades</h1>
+      <h1>Reportes del Comedor</h1>
       <p id="s2-cat-label">Categoría seleccionada</p>
     </div>
 
@@ -140,11 +140,11 @@
           <div class="modo-toggle" role="radiogroup" aria-label="Tipo de reporte">
             <label class="modo-option">
               <input type="radio" name="f-modo" id="f-modo-anonimo" value="anonimo" checked>
-              <span>Reportar anónimo</span>
+              <span>Reportar de forma anónima</span>
             </label>
             <label class="modo-option">
               <input type="radio" name="f-modo" id="f-modo-personalizado" value="personalizado">
-              <span>Reportar con mis datos</span>
+              <span>Reportar con mis datos de asociado</span>
             </label>
           </div>
           <div class="form-hint" id="modo-hint">No se asociará tu reporte con tus datos personales.</div>
@@ -178,13 +178,13 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             <span id="f-datetime"></span>
           </div>
-          <div class="form-hint">Capturada automáticamente</div>
+          <div class="form-hint">Se registra automáticamente</div>
         </div>
         <!-- Situacion -->
         <div class="field-group-title">Situación</div>
         <div class="form-field">
-          <label class="form-label">¿Qué ocurrió? <span>*</span></label>
-          <textarea class="form-textarea" id="f-desc" placeholder="Describe con detalle qué ocurrió y dónde dentro del comedor..."></textarea>
+          <label class="form-label">¿Qué sucedió? <span>*</span></label>
+          <textarea class="form-textarea" id="f-desc" placeholder="Describe qué sucedió, dónde ocurrió y cualquier detalle que ayude a revisar la situación."></textarea>
         </div>
         <!-- Foto -->
         <div class="field-group-title">Evidencia (opcional)</div>
@@ -192,12 +192,12 @@
           <label class="form-label">Fotografía</label>
           <div class="photo-area" id="photo-area">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue);margin:0 auto 6px;display:block;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-            <p>Toca para tomar o seleccionar foto</p>
-            <small>JPG, PNG — máx. 5 MB</small>
+            <p>Toca para tomar una fotografía o seleccionar una imagen</p>
+            <small>Formatos JPG y PNG. Tamaño máximo: 5 MB.</small>
           </div>
           <input type="file" id="f-foto" accept="image/*" capture="environment" style="display:none;">
           <img id="photo-preview" alt="Vista previa">
-          <button type="button" id="btn-remove-foto" class="btn-secondary hidden" style="margin-top:6px;width:auto;padding:6px 14px;font-size:.75rem;"> Quitar foto</button>
+          <button type="button" id="btn-remove-foto" class="btn-secondary hidden" style="margin-top:6px;width:auto;padding:6px 14px;font-size:.75rem;">Quitar foto</button>
         </div>
 
         <button class="btn-primary" id="btn-enviar-reporte">Enviar reporte</button>
@@ -210,8 +210,8 @@
   <div id="step-confirm" class="hidden">
     <div class="confirm-wrap">
       <div class="confirm-icon" id="confirm-icon"></div>
-      <h2>Reporte registrado</h2>
-      <p>Gracias por ayudarnos a identificar oportunidades de mejora.</p>
+      <h2>¡Tu reporte se registró correctamente!</h2>
+      <p>Gracias por contribuir a mejorar el servicio del comedor.</p>
       <div class="folio-box">
         <div class="folio-label">Folio de seguimiento</div>
         <div class="folio-num" id="c-folio">—</div>
@@ -223,7 +223,7 @@
         <div class="confirm-row"><span>Fecha</span><span id="c-fecha">—</span></div>
         <div class="confirm-row"><span>Estado</span><span id="c-estado">—</span></div>
       </div>
-      <p style="font-size:.78rem;color:var(--text2);max-width:300px;">Guarda tu folio: puedes consultar el avance de tu reporte cuando quieras desde "Consultar mi reporte" en la pantalla principal.</p>
+      <p style="font-size:.78rem;color:var(--text2);max-width:300px;">Guarda tu folio para consultar el estado y las actualizaciones de tu reporte en cualquier momento.</p>
       <a id="btn-whatsapp-confirmar" href="#" target="_blank" rel="noopener" class="btn-secondary hidden" style="max-width:280px;display:block;text-align:center;text-decoration:none;margin-top:10px;">Compartir reporte por WhatsApp</a>
 
       <div id="push-opt-in" class="hidden" style="max-width:300px;margin-top:14px;padding:12px;background:var(--surface);border-radius:var(--radius-sm);">
@@ -239,21 +239,21 @@
   <!-- CONSULTAR REPORTE -->
   <div id="step-consulta" class="hidden">
     <div class="aso-header">
-      <h1>Consultar mi reporte</h1>
+      <h1>Consultar seguimiento</h1>
       <p>Escribe el folio que recibiste al enviar tu reporte.</p>
     </div>
     <div style="padding:20px 16px 24px;">
       <div class="form-field">
         <label class="form-label" for="consulta-folio">Folio del reporte</label>
-        <input class="form-input" id="consulta-folio" type="text" placeholder="Ej. COM-2026-000123">
+        <input class="form-input" id="consulta-folio" type="text" placeholder="Ej. COM-2026-4F2A9C1B">
       </div>
       <button class="btn-primary" id="btn-consultar-folio">Consultar reporte</button>
       <button class="btn-secondary" id="btn-volver-inicio-consulta" style="margin-top:10px;">← Volver al inicio</button>
 
-      <div id="consulta-cargando" class="hidden" style="margin-top:20px;font-size:.82rem;color:var(--text2);text-align:center;">Buscando tu reporte...</div>
+      <div id="consulta-cargando" class="hidden" style="margin-top:20px;font-size:.82rem;color:var(--text2);text-align:center;">Consultando información del reporte...</div>
 
       <div id="consulta-no-encontrado" class="hidden" style="margin-top:20px;background:#fff3cd;color:#664d03;padding:14px;border-radius:10px;font-size:.82rem;">
-        No encontramos un reporte con ese folio. Verifica que esté completo y sin espacios.
+        No encontramos un reporte con ese folio. Verifica que lo hayas ingresado correctamente e inténtalo de nuevo.
       </div>
 
       <div id="consulta-resultado" class="hidden" style="margin-top:20px;">
@@ -270,7 +270,7 @@
           <p id="q-desc" style="font-size:.82rem;color:var(--text2);margin-top:4px;">—</p>
         </div>
         <div class="detail-section" style="margin-top:16px;">
-          <h4>Avance</h4>
+          <h4>Historial de seguimiento</h4>
           <div id="q-historial"></div>
         </div>
       </div>
@@ -296,7 +296,7 @@
     <div class="login-box">
       <div class="logo">🍽️</div>
       <h2>Panel Administrativo</h2>
-      <p>Reporte de Oportunidades — Comedor</p>
+      <p>Gestión de reportes del comedor</p>
       <div class="form-field" style="text-align:left;">
         <label class="form-label">Correo</label>
         <input class="form-input" id="l-user" type="email" placeholder="admin@walmart.com" autocomplete="username">
@@ -305,7 +305,7 @@
         <label class="form-label">Contraseña</label>
         <input class="form-input" id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password">
       </div>
-      <div id="l-error" style="color:var(--red);font-size:.78rem;margin-bottom:10px;display:none;">Usuario o contraseña incorrectos.</div>
+      <div id="l-error" style="color:var(--red);font-size:.78rem;margin-bottom:10px;display:none;">Correo o contraseña incorrectos.</div>
       <button class="btn-primary" id="btn-login">Entrar al panel</button>
       <button class="btn-secondary" id="btn-show-asociado">← Volver al formulario</button>
     </div>
@@ -317,16 +317,16 @@
 ═══════════════════════════════════ -->
 <div id="app-admin" class="hidden">
   <div class="admin-header-bar">
-    <h1>Reportes Comedor</h1>
+    <h1>Gestión de reportes</h1>
     <div class="right">
       <button class="btn-export" id="btn-activar-notif-admin" style="display:none;">Activar notificaciones</button>
       <button class="btn-logout" id="btn-logout">Salir</button>
     </div>
   </div>
   <div class="admin-nav">
-    <div class="nav-tab active" data-tab="dashboard">Dashboard</div>
+    <div class="nav-tab active" data-tab="dashboard">Resumen general</div>
     <div class="nav-tab" data-tab="reportes">Reportes</div>
-    <div class="nav-tab" data-tab="tendencias">Tendencias</div>
+    <div class="nav-tab" data-tab="tendencias">Análisis de tendencias</div>
     <div class="nav-tab" data-tab="config">Configuración</div>
   </div>
 
@@ -384,13 +384,13 @@
         <option value="baja">Baja</option>
       </select>
       <select class="filter-select" id="f-status">
-        <option value="">Todos los estatus</option>
+        <option value="">Todos los estados</option>
         <option value="pendiente">Pendiente</option>
         <option value="revision">En revisión</option>
         <option value="atendido">Atendido</option>
         <option value="cerrado">Cerrado</option>
       </select>
-      <button class="btn-export" id="btn-export-csv">Exportar CSV</button>
+      <button class="btn-export" id="btn-export-csv">Exportar reportes (CSV)</button>
     </div>
     <div class="table-wrap">
       <table>
@@ -399,7 +399,7 @@
             <th>Folio</th><th>Fecha</th><th>Hora</th>
             <th>Comedor</th><th>Categoría</th>
             <th>Prioridad</th><th>Asociado</th>
-            <th>Descripción</th><th>Estatus</th><th>Acción</th>
+            <th>Situación</th><th>Estado</th><th>Detalle</th>
           </tr>
         </thead>
         <tbody id="tabla-body"></tbody>
@@ -435,13 +435,13 @@
       <div class="chart-title">WhatsApp para reportes</div>
       <p style="font-size:.8rem;color:var(--text2);margin-bottom:14px;line-height:1.5;">
         Número al que los asociados pueden enviar por WhatsApp el resumen de su reporte
-        (solo aparece en reportes "con mis datos", nunca en anónimos). Déjalo vacío
+        (solo aparece en reportes "con mis datos de asociado", nunca en anónimos). Déjalo vacío
         para ocultar esa opción.
       </p>
       <div class="form-field">
         <label class="form-label" for="cfg-whatsapp">Número de WhatsApp</label>
         <input class="form-input" id="cfg-whatsapp" type="text" inputmode="numeric" placeholder="Ej. 529931234567" maxlength="15">
-        <div class="form-hint">Solo dígitos, con código de país. Vacío = botón de WhatsApp desactivado.</div>
+        <div class="form-hint">Solo dígitos, con código de país. Si lo dejas vacío, el botón de WhatsApp quedará desactivado.</div>
       </div>
       <p id="cfg-whatsapp-msg" class="form-hint hidden"></p>
       <button class="btn-primary" id="btn-guardar-whatsapp" style="margin-top:6px;">Guardar número</button>
@@ -455,7 +455,7 @@
   <div class="modal-box">
     <div class="modal-header">
       <div>
-        <h3 id="m-folio">COM-2026-000001</h3>
+        <h3 id="m-folio">COM-2026-4F2A9C1B</h3>
         <p id="m-fecha">—</p>
       </div>
       <button class="btn-close" id="btn-close-modal">✕</button>
@@ -468,8 +468,8 @@
         <div class="detail-row"><span>Comedor</span><span id="m-comedor">—</span></div>
         <div class="detail-row"><span>Tipo de reporte</span><span id="m-modo-badge" class="badge badge-gray">—</span></div>
         <div class="detail-row"><span>Asociado</span><span id="m-asociado">—</span></div>
-        <div class="detail-row"><span>No. Empleado</span><span id="m-empleado">—</span></div>
-        <div class="detail-row"><span>Descripción</span><span id="m-desc">—</span></div>
+        <div class="detail-row"><span>Número de asociado</span><span id="m-empleado">—</span></div>
+        <div class="detail-row"><span>Situación</span><span id="m-desc">—</span></div>
         <div class="detail-row" id="m-foto-row" style="display:block;">
           <span>Evidencia fotográfica</span>
           <div style="margin-top:8px;">
@@ -481,9 +481,9 @@
         </div>
       </div>
       <div class="detail-section">
-        <h4>Estatus y gestión</h4>
+        <h4>Seguimiento y gestión</h4>
         <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;">
-          <label style="font-size:.78rem;font-weight:700;">Estatus:</label>
+          <label style="font-size:.78rem;font-weight:700;">Estado:</label>
           <select class="status-select" id="m-status-sel">
             <option value="pendiente">Pendiente</option>
             <option value="revision">En revisión</option>
@@ -494,15 +494,15 @@
         <div class="action-form">
           <label>Responsable</label>
           <input type="text" id="m-responsable" placeholder="Nombre del responsable">
-          <label>Acción realizada</label>
-          <textarea id="m-accion" placeholder="Describe la acción tomada..." style="min-height:60px;"></textarea>
-          <label>Fecha compromiso</label>
+          <label>Acción implementada</label>
+          <textarea id="m-accion" placeholder="Describe las acciones realizadas para atender la situación." style="min-height:60px;"></textarea>
+          <label>Fecha de compromiso</label>
           <input type="date" id="m-fecha-comp">
-          <button class="btn-save-action" id="btn-guardar-accion">💾 Guardar gestión</button>
+          <button class="btn-save-action" id="btn-guardar-accion">Guardar seguimiento</button>
         </div>
       </div>
       <div class="detail-section">
-        <h4>Historial</h4>
+        <h4>Historial de seguimiento</h4>
         <div id="m-historial"></div>
       </div>
     </div>
@@ -576,8 +576,8 @@
         <!-- Centro: badges + QR + spark -->
         <div style="padding:16px;text-align:center;background:white;">
           <div style="display:flex;justify-content:center;gap:8px;margin-bottom:14px;">
-            <div style="background:var(--blue);color:white;padding:4px 12px;border-radius:20px;font-size:.7rem;font-weight:800;letter-spacing:.05em;">🍽️ COMEDOR WALMART</div>
-            <div style="background:var(--yellow);color:var(--blue-dark);padding:4px 12px;border-radius:20px;font-size:.7rem;font-weight:800;">📱 Escanea aquí</div>
+            <div style="background:var(--blue);color:white;padding:4px 12px;border-radius:20px;font-size:.7rem;font-weight:800;letter-spacing:.05em;">COMEDOR WALMART</div>
+            <div style="background:var(--yellow);color:var(--blue-dark);padding:4px 12px;border-radius:20px;font-size:.7rem;font-weight:800;">Escanea aquí</div>
           </div>
 
           <!-- QR con borde punteado y spark -->
@@ -637,7 +637,7 @@
             </div>
             <div style="background:#f0f6ff;border-radius:10px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px;font-size:.73rem;color:var(--text);line-height:1.4;">
               <div style="width:20px;height:20px;background:var(--blue);color:white;border-radius:50%;font-size:.65rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
-              Llena los datos y describe la oportunidad
+              Llena los datos y describe la situación
             </div>
             <div style="background:#f0f6ff;border-radius:10px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px;font-size:.73rem;color:var(--text);line-height:1.4;">
               <div style="width:20px;height:20px;background:var(--blue);color:white;border-radius:50%;font-size:.65rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
@@ -685,7 +685,7 @@
     </div>
   </div>
 
-  <button onclick="window.print()" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;padding:13px;background:var(--yellow);color:var(--blue-dark);border:none;border-radius:12px;font-weight:800;font-size:.9rem;cursor:pointer;">🖨️ Imprimir para colocar en el comedor</button>
+  <button onclick="window.print()" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;padding:13px;background:var(--yellow);color:var(--blue-dark);border:none;border-radius:12px;font-weight:800;font-size:.9rem;cursor:pointer;">Imprimir cartel para el comedor</button>
   <button id="btn-qr-volver" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:8px;padding:11px;background:white;color:var(--text);border:1.5px solid var(--border);border-radius:12px;font-weight:700;font-size:.88rem;cursor:pointer;">← Volver al formulario</button>
 </div>
 

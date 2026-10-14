@@ -37,7 +37,7 @@ export function initAuth({ onLogin } = {}) {
 
   async function handleLogin() {
     if (!isSupabaseConfigured) {
-      errorBox.textContent = 'El backend todavia no esta configurado (falta js/config.js).';
+      errorBox.textContent = 'El sistema aún no está configurado. Contacta al equipo de soporte técnico.';
       errorBox.style.display = 'block';
       return;
     }

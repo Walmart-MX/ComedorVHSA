@@ -51,7 +51,7 @@ begin
     url     := 'https://switfyozjhfceqysvcji.supabase.co/functions/v1/notificar-push',
     headers := jsonb_build_object(
                  'Content-type', 'application/json',
-                 'Authorization', 'Bearer <SERVICE_ROLE_KEY>'
+                 'Authorization', 'Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3aXRmeW96amhmY2VxeXN2Y2ppIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MTMwMDE4NCwiZXhwIjoyMTA2ODc2MTg0fQ.woLhIZtBOL46QPvFeToDFXucC8V7buWCVW3wvz5T8Ak>'
                ),
     body    := jsonb_build_object(
                  'type', 'INSERT',

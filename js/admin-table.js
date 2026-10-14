@@ -1,7 +1,7 @@
 import { supabase, isSupabaseConfigured } from './supabase-client.js';
 import {
   CAT_NAMES, COMEDOR_NAMES, PRI_LABELS, PRI_BADGE,
-  STATUS_LABELS, STATUS_BADGE, MODO_REPORTE_LABELS, escapeHtml
+  STATUS_LABELS, STATUS_BADGE, MODO_REPORTE_LABELS, fechaLocalISO, escapeHtml
 } from './catalog.js';
 import { getCachedReportes } from './admin-dashboard.js';
 
@@ -19,6 +19,16 @@ export function initAdminTable() {
   document.getElementById('btn-guardar-accion')?.addEventListener('click', guardarAccion);
 }
 
+/** Fecha y hora en la zona LOCAL del navegador -- ver nota en fechaLocalISO()
+    sobre por que nunca hay que usar creado_en.split('T') crudo (eso muestra
+    la hora UTC de Postgres como si fuera la hora local del CEDIS). */
+function formatFecha(creadoEn) {
+  return new Date(creadoEn).toLocaleDateString('es-MX');
+}
+function formatHora(creadoEn) {
+  return new Date(creadoEn).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+}
+
 export function renderTabla() {
   let r = getCachedReportes();
   const search = document.getElementById('f-search')?.value.toLowerCase() || '';
@@ -34,7 +44,7 @@ export function renderTabla() {
   document.getElementById('tabla-body').innerHTML = r.map(x => `
     <tr>
       <td><span class="td-folio" data-id="${x.id}">${escapeHtml(x.folio)}${x.es_demo ? '<br><span style="font-size:.6rem;color:var(--text2);">demo</span>' : ''}</span></td>
-      <td>${escapeHtml(x.creado_en.split('T')[0])}</td><td>${escapeHtml(x.creado_en.split('T')[1]?.slice(0, 5) || '')}</td>
+      <td>${escapeHtml(formatFecha(x.creado_en))}</td><td>${escapeHtml(formatHora(x.creado_en))}</td>
       <td>${COMEDOR_NAMES[x.comedor] || x.comedor}</td>
       <td>${escapeHtml(CAT_NAMES[x.categoria] || x.categoria)}</td>
       <td><span class="badge ${PRI_BADGE[x.prioridad]}">${PRI_LABELS[x.prioridad]}</span></td>
@@ -53,7 +63,7 @@ async function openModal(id) {
   if (!r) return;
   editingId = id;
   document.getElementById('m-folio').textContent = r.folio + (r.es_demo ? ' (DEMO)' : '');
-  document.getElementById('m-fecha').textContent = `${r.creado_en.split('T')[0]} ${r.creado_en.split('T')[1]?.slice(0, 5) || ''}`;
+  document.getElementById('m-fecha').textContent = `${formatFecha(r.creado_en)} ${formatHora(r.creado_en)}`;
   document.getElementById('m-cat').textContent = CAT_NAMES[r.categoria] || r.categoria;
   document.getElementById('m-pri').textContent = PRI_LABELS[r.prioridad];
   document.getElementById('m-comedor').textContent = COMEDOR_NAMES[r.comedor] || r.comedor;
@@ -157,20 +167,20 @@ async function guardarAccion() {
   const { error } = await supabase.from('reportes').update(payload).eq('id', editingId);
   if (error) {
     console.error(error);
-    alert('No se pudo guardar la gestión. Intenta de nuevo.');
+    alert('No se pudo guardar el seguimiento. Intenta de nuevo.');
     return;
   }
   closeModal();
   document.dispatchEvent(new CustomEvent('reportes:actualizados'));
-  alert('Gestión guardada correctamente.');
+  alert('Seguimiento guardado correctamente.');
 }
 
 function exportCSV() {
   const r = getCachedReportes();
-  const headers = ['Folio', 'Fecha', 'Comedor', 'Categoria', 'Prioridad', 'Asociado', 'No Empleado', 'Descripcion', 'Estatus', 'Responsable', 'Accion', 'Demo'];
+  const headers = ['Folio', 'Fecha', 'Comedor', 'Categoria', 'Prioridad', 'Asociado', 'Numero de asociado', 'Situacion', 'Estado', 'Responsable', 'Accion implementada', 'Demo'];
   const csvCell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
   const rows = r.map(x => [
-    x.folio, x.creado_en.split('T')[0],
+    x.folio, fechaLocalISO(x.creado_en),
     COMEDOR_NAMES[x.comedor] || x.comedor,
     CAT_NAMES[x.categoria] || x.categoria, x.prioridad, x.nombre || 'Anonimo',
     x.numero_empleado || '', x.descripcion, x.estatus, x.responsable || '', x.accion || '',
@@ -181,7 +191,7 @@ function exportCSV() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `reportes-comedor-${new Date().toISOString().split('T')[0]}.csv`;
+  a.download = `reportes-comedor-${fechaLocalISO(new Date())}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }
