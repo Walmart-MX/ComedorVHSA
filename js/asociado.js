@@ -171,7 +171,7 @@ async function enviarReporte() {
 
     if (error) throw error;
 
-    mostrarConfirmacion(data[0]);
+    mostrarConfirmacion({ ...data[0], foto_url });
   } catch (err) {
     console.error(err);
     alert('No pudimos guardar tu reporte. Revisa tu conexión e intenta de nuevo.');

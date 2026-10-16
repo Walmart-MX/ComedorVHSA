@@ -16,6 +16,15 @@ if (!isSupabaseConfigured) {
   document.getElementById('backend-warning')?.classList.remove('hidden');
 }
 
+/* Deep link desde una notificacion push de admin (?admin_folio=XXX en la
+   URL, ver service-worker.js). Declarada ANTES de llamar a cualquier
+   funcion que la use (manejarDeepLink, mas abajo) -- un "let" solo existe
+   a partir de su propia linea (temporal dead zone); si la llamada hubiera
+   ocurrido antes, el script entero se habria roto con un ReferenceError y
+   ni siquiera el cambio de pestañas del panel habria quedado conectado
+   (hallazgo real reportado: el admin se quedaba atorado en "Resumen"). */
+let folioAdminPendiente = null;
+
 cargarConfiguracion();
 initAdminTable();
 initAdminConfig();
@@ -61,11 +70,6 @@ async function refrescarTodo() {
   if (tabActiva === 'reportes') renderTabla();
   if (tabActiva === 'tendencias') renderTendencias();
 }
-
-/* Deep link desde una notificacion push de admin (?admin_folio=XXX en la
-   URL, ver service-worker.js). Si el admin aun no ha iniciado sesion, el
-   folio se guarda y se abre en cuanto el login se complete (onAdminLogin). */
-let folioAdminPendiente = null;
 
 function manejarDeepLink() {
   folioAdminPendiente = new URLSearchParams(window.location.search).get('admin_folio');

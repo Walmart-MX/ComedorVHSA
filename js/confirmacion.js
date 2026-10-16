@@ -3,18 +3,12 @@
    pasa AQUÍ es opcional y ocurre DESPUÉS de que el reporte ya se
    guardó -- nada de esto bloquea ni condiciona el registro:
      1) Copiar el folio.
-     2) Compartir el resumen por WhatsApp (el reporte sigue siendo
-        anónimo: solo se comparte el folio/categoría/fecha, nunca un
-        dato que identifique a quien reportó).
-     3) Pedir atención personalizada: dejar voluntariamente un medio
-        de contacto ligado SOLO al folio (nunca a una identidad), para
-        que el equipo de comedor pueda buscar a esa persona en el
-        comedor o llamarle, sin que el sistema sepa quién es.
-     4) Activar notificaciones del folio (ver push.js) -- también
-        ligadas solo al folio, nunca a una persona.
+     2) Compartir el reporte por WhatsApp (resumen con emojis, y la
+        foto de evidencia si el reporte trae una).
+     3) Activar notificaciones del folio (ver push.js) -- ligadas
+        solo al folio, nunca a una persona.
 ═══════════════════════════════════════════════════════════════ */
 
-import { supabase, isSupabaseConfigured } from './supabase-client.js';
 import { CAT_NAMES, COMEDOR_NAMES, STATUS_PUBLICO } from './catalog.js';
 import { getWhatsappDestino, cargarConfiguracion } from './app-config.js';
 import { activarNotificacionesReporte, pushDisponible } from './push.js';
@@ -33,7 +27,6 @@ export function mostrarConfirmacion(r) {
 
   wireCopiarFolio();
   wireWhatsapp(r);
-  wireAtencionPersonalizada();
   mostrarOpcionNotificaciones();
 }
 
@@ -51,15 +44,49 @@ function wireCopiarFolio() {
   });
 }
 
-/** El botón de WhatsApp comparte un resumen SIN datos personales (el
-    reporte es siempre anónimo) -- es simplemente un canal adicional para
-    avisar al equipo, nunca una condición para registrar el reporte. Se
-    vuelve a pedir la configuración (en vez de confiar en el cache que
-    cargó main-app.js al arrancar) porque esa carga inicial podría no
-    haber terminado todavía. */
+/* Un emoji por categoría, solo para que el mensaje de WhatsApp se lea con
+   más cuerpo y sea fácil de identificar de un vistazo -- son decorativos,
+   nunca reemplazan el texto (accesible igual para quien lee el mensaje
+   sin que su app muestre emojis). */
+const CAT_EMOJI = {
+  temperatura: '\u{1F321}\u{FE0F}',
+  calidad: '\u{1F34E}',
+  coccion: '\u{1F525}',
+  porcion: '\u{1F37D}\u{FE0F}',
+  objeto: '\u{26A0}\u{FE0F}',
+  limpieza: '\u{2728}',
+  espera: '\u{23F3}',
+  atencion: '\u{1F4AC}',
+  higiene: '\u{1F9FC}',
+  otra: '\u{1F4DD}'
+};
+
+function construirResumenWhatsapp(r) {
+  const emojiCat = CAT_EMOJI[r.categoria] || '\u{1F4CB}';
+  const lineas = [
+    `*Reporte del comedor* \u{1F37D}\u{FE0F}`,
+    `\u{1F3F7}\u{FE0F} Folio: ${r.folio}`,
+    `${emojiCat} Categoría: ${CAT_NAMES[r.categoria]}`,
+    `\u{1F4CD} Comedor: ${COMEDOR_NAMES[r.comedor] || r.comedor}`,
+    `\u{1F4C5} Fecha: ${new Date(r.creado_en).toLocaleString('es-MX')}`
+  ];
+  if (r.foto_url) lineas.push(`\u{1F4F7} Foto: ${r.foto_url}`);
+  return lineas.join('\n');
+}
+
+/** El botón de WhatsApp comparte el reporte (folio/categoría/comedor/fecha,
+    y la foto si existe) -- es simplemente un canal adicional para avisar al
+    equipo, nunca una condición para registrar el reporte (que ya se guardó
+    antes de llegar aquí). Se vuelve a pedir la configuración (en vez de
+    confiar en el cache que cargó main-app.js al arrancar) porque esa carga
+    inicial podría no haber terminado todavía. */
 async function wireWhatsapp(r) {
-  const btn = document.getElementById('btn-whatsapp-confirmar');
+  let btn = document.getElementById('btn-whatsapp-confirmar');
   if (!btn) return;
+  btn.replaceWith(btn.cloneNode(true)); // evita listeners duplicados entre reportes
+  btn = document.getElementById('btn-whatsapp-confirmar');
+  btn.classList.add('hidden');
+
   try {
     await Promise.race([
       cargarConfiguracion(),
@@ -68,76 +95,41 @@ async function wireWhatsapp(r) {
   } catch (err) {
     console.error('No se pudo refrescar la configuración de WhatsApp:', err.message || err);
   }
-  const destino = getWhatsappDestino();
-  if (!destino) {
-    btn.classList.add('hidden');
-    return;
-  }
-  const resumen = `Reporte registrado en el sistema de comedor (anónimo)\nFolio: ${r.folio}\nCategoría: ${CAT_NAMES[r.categoria]}\nComedor: ${COMEDOR_NAMES[r.comedor] || r.comedor}\nFecha: ${new Date(r.creado_en).toLocaleString('es-MX')}`;
-  btn.href = `https://wa.me/${destino}?text=${encodeURIComponent(resumen)}`;
+
+  if (!getWhatsappDestino()) return;
   btn.classList.remove('hidden');
+  btn.addEventListener('click', () => compartirPorWhatsapp(r));
 }
 
-/** "Recibir atención personalizada": revela un mini-formulario opcional
-    para dejar un medio de contacto ligado SOLO al folio -- nunca pide
-    nombre ni número de asociado. Quien no lo use, queda 100% anónimo. */
-function wireAtencionPersonalizada() {
-  const btnAbrir = document.getElementById('btn-abrir-atencion');
-  const form = document.getElementById('atencion-form');
-  const btnEnviar = document.getElementById('btn-enviar-atencion');
-  const resultado = document.getElementById('atencion-resultado');
-  if (!btnAbrir || !form || !btnEnviar) return;
+/** Intenta adjuntar la FOTO real al compartir (Web Share API, disponible en
+    la mayoría de navegadores móviles): se abre el panel nativo de compartir
+    y el usuario elige WhatsApp ahí. Si el dispositivo no lo soporta, o algo
+    falla al traer la foto, se cae al enlace clásico de WhatsApp (wa.me) con
+    el resumen en texto -- ese SIEMPRE incluye la URL de la foto como un
+    link, así que la foto sigue siendo accesible con un toque aunque no
+    viaje "adjunta" de verdad. */
+async function compartirPorWhatsapp(r) {
+  const destino = getWhatsappDestino();
+  if (!destino) return;
+  const resumen = construirResumenWhatsapp(r);
 
-  form.classList.add('hidden');
-  resultado.classList.add('hidden');
-  document.getElementById('atencion-contacto').value = '';
-  btnAbrir.classList.remove('hidden');
-
-  btnAbrir.replaceWith(btnAbrir.cloneNode(true));
-  const btnAbrirNuevo = document.getElementById('btn-abrir-atencion');
-  btnAbrirNuevo.addEventListener('click', () => {
-    btnAbrirNuevo.classList.add('hidden');
-    form.classList.remove('hidden');
-  });
-
-  btnEnviar.replaceWith(btnEnviar.cloneNode(true));
-  document.getElementById('btn-enviar-atencion').addEventListener('click', enviarSolicitudAtencion);
-}
-
-async function enviarSolicitudAtencion() {
-  const medio = document.getElementById('atencion-medio').value;
-  const contacto = document.getElementById('atencion-contacto').value.trim();
-  const resultado = document.getElementById('atencion-resultado');
-  const btn = document.getElementById('btn-enviar-atencion');
-
-  if (!contacto) {
-    resultado.className = 'form-hint cfg-msg-error';
-    resultado.textContent = 'Escribe un número de teléfono o WhatsApp para que te contactemos.';
-    resultado.classList.remove('hidden');
-    return;
+  if (r.foto_url && navigator.share && navigator.canShare) {
+    try {
+      const respuesta = await fetch(r.foto_url);
+      const blob = await respuesta.blob();
+      const archivo = new File([blob], 'evidencia-comedor.jpg', { type: blob.type || 'image/jpeg' });
+      if (navigator.canShare({ files: [archivo] })) {
+        await navigator.share({ files: [archivo], text: resumen, title: 'Reporte del comedor' });
+        return;
+      }
+    } catch (err) {
+      // Fetch/permiso/cancelado: no es un error fatal, solo significa que
+      // usamos el enlace de WhatsApp de abajo en vez del share nativo.
+      console.error('No se pudo compartir la foto directamente, se usará WhatsApp con el enlace en el texto:', err);
+    }
   }
-  if (!isSupabaseConfigured || !folioActual) return;
 
-  btn.disabled = true;
-  btn.textContent = 'Enviando...';
-  const { error } = await supabase.rpc('solicitar_atencion_personalizada', {
-    p_folio: folioActual,
-    p_medio: medio,
-    p_contacto: contacto
-  });
-  btn.disabled = false;
-  btn.textContent = 'Solicitar atención';
-
-  resultado.classList.remove('hidden');
-  if (error) {
-    console.error(error);
-    resultado.className = 'form-hint cfg-msg-error';
-    resultado.textContent = 'No se pudo enviar tu solicitud. Intenta de nuevo.';
-    return;
-  }
-  resultado.className = 'form-hint cfg-msg-ok';
-  resultado.textContent = 'Listo. El equipo de comedor te contactará pronto. Tu reporte sigue siendo anónimo en el sistema.';
-  document.getElementById('atencion-form').classList.add('hidden');
+  window.open(`https://wa.me/${destino}?text=${encodeURIComponent(resumen)}`, '_blank', 'noopener');
 }
 
 /** Notificaciones ligadas SOLO al folio (nunca a una persona): se ofrece

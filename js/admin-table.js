@@ -75,33 +75,7 @@ async function openModal(id) {
   document.getElementById('m-fecha-comp').value = r.fecha_compromiso || '';
   document.getElementById('modal-detalle').classList.remove('hidden');
 
-  await Promise.all([cargarHistorial(id), cargarAtencionSolicitada(r.folio)]);
-}
-
-const MEDIO_LABELS = { whatsapp: 'WhatsApp', llamada: 'Llamada telefónica' };
-
-/** Reporte siempre anónimo: esto NUNCA trae nombre ni número de asociado,
-    solo el contacto que la persona dejó voluntariamente (si lo hizo) para
-    que el equipo de comedor le dé seguimiento a ESTE folio. */
-async function cargarAtencionSolicitada(folio) {
-  const box = document.getElementById('m-atencion');
-  if (!box) return;
-  if (!isSupabaseConfigured) {
-    box.textContent = '—';
-    return;
-  }
-  const { data, error } = await supabase
-    .from('reportes_atencion')
-    .select('medio, contacto, creado_en')
-    .eq('folio', folio)
-    .order('creado_en', { ascending: false })
-    .limit(1);
-  if (error || !data || data.length === 0) {
-    box.textContent = 'No solicitada';
-    return;
-  }
-  const sol = data[0];
-  box.innerHTML = `${escapeHtml(MEDIO_LABELS[sol.medio] || sol.medio)}: <strong>${escapeHtml(sol.contacto)}</strong>`;
+  await cargarHistorial(id);
 }
 
 async function cargarHistorial(reporteId) {

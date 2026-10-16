@@ -18,12 +18,6 @@
       puede seguir recibiendo avisos de SU reporte sin que el sistema
       sepa quien es -- la suscripcion solo conoce el folio, nunca una
       identidad persistente entre reportes.
-   4) Nueva tabla "reportes_atencion": permite, de forma 100% opcional
-      y voluntaria DESPUES de enviar el reporte, dejar un contacto
-      (telefono/WhatsApp) para que el equipo de comedor pueda dar
-      seguimiento personalizado a ESE folio en particular. Nunca se
-      cruza con nombre/numero de empleado (ya no existen en el
-      sistema) y solo el panel admin puede leerla.
 ═══════════════════════════════════════════════════════════════ */
 
 -- ── 1) Limpiar crear_reporte: fuera numero_empleado/nombre/modo_reporte ──
@@ -129,54 +123,3 @@ $$;
 
 grant execute on function public.guardar_push_subscription_reporte(text, text, text, text, text) to anon, authenticated;
 drop function if exists public.guardar_push_subscription_asociado(text, text, text, text, text);
-
--- ── 4) Atencion personalizada opcional, ligada SOLO al folio ──
-create table if not exists public.reportes_atencion (
-  id          bigint generated always as identity primary key,
-  folio       text not null references public.reportes(folio) on delete cascade,
-  medio       text not null check (medio in ('whatsapp', 'llamada')),
-  contacto    text not null,
-  atendido    boolean not null default false,
-  creado_en   timestamptz not null default now()
-);
-
-create index if not exists idx_reportes_atencion_folio on public.reportes_atencion(folio);
-
-alter table public.reportes_atencion enable row level security;
-
--- Nadie (ni anon ni authenticated) inserta directo: solo la funcion de
--- abajo, que primero valida que el folio exista de verdad.
-drop policy if exists "admin lee solicitudes de atencion" on public.reportes_atencion;
-create policy "admin lee solicitudes de atencion"
-  on public.reportes_atencion for select
-  to authenticated
-  using (true);
-
-drop policy if exists "admin actualiza solicitudes de atencion" on public.reportes_atencion;
-create policy "admin actualiza solicitudes de atencion"
-  on public.reportes_atencion for update
-  to authenticated
-  using (true)
-  with check (true);
-
-create or replace function public.solicitar_atencion_personalizada(
-  p_folio text,
-  p_medio text,
-  p_contacto text
-)
-returns void
-language plpgsql
-security definer
-set search_path = public
-as $$
-begin
-  if not exists (select 1 from public.reportes where folio = p_folio) then
-    raise exception 'folio no encontrado';
-  end if;
-
-  insert into public.reportes_atencion (folio, medio, contacto)
-  values (p_folio, p_medio, p_contacto);
-end;
-$$;
-
-grant execute on function public.solicitar_atencion_personalizada(text, text, text) to anon, authenticated;

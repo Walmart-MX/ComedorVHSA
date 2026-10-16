@@ -32,12 +32,13 @@ El sistema **nunca** pide nombre ni número de asociado, en ningún punto del
 flujo. No existe un modo "con mis datos": todo reporte es anónimo, siempre.
 En la pantalla de confirmación, de forma completamente opcional, se puede:
 
-- **Compartir por WhatsApp** un resumen del folio (sin datos personales).
-- **Pedir atención personalizada**: dejar un teléfono de contacto ligado
-  *solo al folio* (tabla `reportes_atencion`), nunca a una identidad
-  persistente. El admin lo ve únicamente al abrir el detalle de ese reporte.
-- **Activar notificaciones** de cambios de estatus, también ligadas solo al
-  folio (`push_subscriptions`, tipo `reporte`), nunca a una persona.
+- **Compartir por WhatsApp**: un resumen con emojis (folio, categoría,
+  comedor, fecha) al número configurado en el panel admin. Si el reporte
+  trae foto, se intenta adjuntarla de verdad usando el panel nativo de
+  compartir del navegador (Web Share API); si el dispositivo no lo soporta,
+  el mensaje de WhatsApp igual incluye el link directo a la foto.
+- **Activar notificaciones** de cambios de estatus, ligadas solo al folio
+  (`push_subscriptions`, tipo `reporte`), nunca a una persona.
 
 ## Estado del proyecto
 
@@ -81,7 +82,7 @@ js/
   push.js                 Notificaciones push: por folio (asociado) y admin (compartido)
   main-app.js             Punto de entrada de /app/
   asociado.js              Flujo de reporte del asociado (100% anónimo)
-  confirmacion.js         Pantalla post-envío: WhatsApp, atención personalizada, push
+  confirmacion.js         Pantalla post-envío: WhatsApp (con foto) y push
   consulta.js             Consulta pública de un reporte por folio
   main-admin.js           Punto de entrada de /admin/
   auth.js                 Login/logout del panel admin (Supabase Auth)
@@ -134,8 +135,8 @@ solo con el equipo de comedor, no hay ningún link hacia él desde `/app/`.
 - **Anonimato total**: se eliminó por completo el número de asociado, el
   nombre y el modo "con mis datos". Ya no existe la tabla `asociados` ni la
   verificación contra ella -- nada en el sistema puede identificar a quien
-  reportó. Lo único voluntario es dejar un contacto *ligado al folio* para
-  pedir atención personalizada (ver `reportes_atencion`).
+  reportó. El único canal opcional tras enviar el reporte es compartirlo
+  por WhatsApp (folio, categoría, comedor, fecha y foto si existe).
 - **Folios sin colisión y no adivinables**: generados por un trigger de
   Postgres con un código aleatorio (no un contador consecutivo ni un
   `localStorage` del navegador), para que la consulta pública por folio no
