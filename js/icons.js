@@ -27,3 +27,4 @@ const uiIcon = (inner, size = 22) =>
 
 export const CHECK_ICON = uiIcon('<path d="M20 6 9 17l-5-5"/>', 36);
 export const TREND_ICON = uiIcon('<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>', 20);
+export const CAMERA_ICON = uiIcon('<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z"/><circle cx="12" cy="13" r="4"/>', 18);

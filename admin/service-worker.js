@@ -91,8 +91,8 @@ self.addEventListener('push', (event) => {
   const title = payload.title || 'Reportes del Comedor';
   const options = {
     body: payload.body || '',
-    icon: '../icons/icon.svg',
-    badge: '../icons/icon.svg',
+    icon: '../icons/icon-admin-192.png',
+    badge: '../icons/icon-admin-192.png',
     tag: payload.tag,
     data: payload.data || {}
   };

@@ -39,24 +39,55 @@ En la pantalla de confirmación, de forma completamente opcional, se puede:
   el mensaje de WhatsApp igual incluye el link directo a la foto.
 - **Activar notificaciones** de cambios de estatus, ligadas solo al folio
   (`push_subscriptions`, tipo `reporte`), nunca a una persona.
-
-## Estado del proyecto
-
-- [x] Esquema de base de datos (`supabase/migrations/`)
+- [x] Esquema de base de datos (`supabase/migrations/`) -- confirmado en
+      vivo: `guardar_push_subscription_reporte` responde con el error de
+      negocio esperado (folio no encontrado) para un folio sintético, lo
+      que confirma que la migración `20261010120000_anonimato_total.sql`
+      ya está aplicada en el proyecto real.
 - [x] Frontend reescrito en módulos (sin `localStorage` de datos de negocio,
       sin credenciales hardcodeadas, con RLS real)
 - [x] Proyecto de Supabase creado y enlazado (`js/config.js` tiene la URL
-      y anon key reales)
+      y anon key reales -- el anon key SÍ es seguro de exponer, ver
+      comentario en ese archivo)
 - [ ] Primer usuario admin creado en Supabase Auth (confirmar en
       Authentication > Users del dashboard de Supabase)
-- [ ] Secret `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY` configurado en la Edge
-      Function `notificar-push` (sin esto, push queda desactivado solo,
-      no rompe nada -- ver js/push.js)
-- [ ] Trigger `trg_notificar_push` aplicado con la Service Role Key real
-      (ver advertencia en `20261008130100_trigger_notificar_push.sql`:
-      el archivo en el repo trae un placeholder a propósito, se corre a
-      mano en el SQL Editor con la llave real)
+- [ ] Secret `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY`/`VAPID_SUBJECT`
+      configurado en la Edge Function `notificar-push` (sin esto, push
+      queda desactivado solo del lado del servidor -- la llave pública en
+      `js/config.js` ya es real y válida, verificada estructuralmente,
+      pero eso no confirma que el *secret* privado en el servidor exista)
+- [ ] Edge Function `notificar-push` desplegada (`supabase functions
+      deploy notificar-push`) -- no se pudo confirmar desde el navegador
+      por CORS (la función está pensada para ser llamada desde Postgres,
+      no desde un navegador, así que esto es normal y no es un error)
+- [ ] **Secreto de Vault `notificar_push_service_role_key` creado** --
+      corre en el SQL Editor de Supabase (nunca en un archivo del repo):
+      `select vault.create_secret('<Service Role Key real>', 'notificar_push_service_role_key');`
+      Sin esto el trigger de push queda en modo silencioso (no rompe nada,
+      simplemente no avisa a nadie).
+- [ ] Trigger `trg_notificar_push` re-aplicado con la versión corregida de
+      `20261008130100_trigger_notificar_push.sql` (ver ` Hallazgo de
+      seguridad` más abajo -- **esto es urgente, no opcional**)
 - [ ] GitHub Pages activado
+
+**Hallazgo de seguridad (corregido en el código, acción pendiente en
+Supabase):** una versión anterior de `20261008130100_trigger_notificar_push.sql`
+tenía la Service Role Key real del proyecto escrita en texto plano. Ya se
+corrigió en el repo (ahora usa Supabase Vault, ver el propio archivo), pero
+eso **no** revierte una llave que ya pudo haber sido aplicada a la base de
+datos real. Pasos obligatorios, en este orden:
+1. Rotar la Service Role Key ahora mismo: Project Settings → API → Service
+   Role Key → generar una nueva. Esto invalida la llave filtrada sin
+   importar dónde haya quedado una copia.
+2. Correr `supabase/auditoria_migraciones.sql` en el SQL Editor y revisar
+   la columna `alerta_llave_real_todavia_en_la_funcion` -- si da `true`,
+   la función en la base todavía tiene la llave vieja grabada.
+3. Crear el secreto de Vault (ver arriba) y volver a correr el bloque
+   `create or replace function public.fn_notificar_push()` ya corregido
+   para que la función en la base deje de tener cualquier llave en texto
+   plano.
+
+## Estado del proyecto
 
 ## Estructura
 

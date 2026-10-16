@@ -33,11 +33,32 @@
    ya espera supabase/functions/notificar-push/index.ts, para no
    tener que tocar esa funcion.
 
-   IMPORTANTE ANTES DE CORRER ESTE ARCHIVO:
-   Reemplaza <SERVICE_ROLE_KEY> por la Service Role Key real de
-   Project Settings -> API. NO la dejes en el repo de Git en texto
-   plano -- corre este bloque directo en el SQL Editor de Supabase,
-   no lo commitees con la llave real puesta.
+   IMPORTANTE ANTES DE CORRER ESTE ARCHIVO (leer completo):
+   Este trigger llama a la Edge Function con la Service Role Key del
+   proyecto -- esa llave se salta TODO row level security, asi que
+   JAMAS debe escribirse en texto plano dentro de un archivo que se
+   commitea a git (un migration.sql versionado es exactamente eso).
+
+   En vez de eso, la llave real se guarda UNA SOLA VEZ, a mano, en el
+   SQL Editor del dashboard de Supabase (nunca en un archivo del repo)
+   usando Supabase Vault:
+
+     select vault.create_secret(
+       '<pega aqui la Service Role Key real, solo en el SQL Editor>',
+       'notificar_push_service_role_key'
+     );
+
+   La funcion de abajo la lee por NOMBRE en tiempo de ejecucion via
+   vault.decrypted_secrets -- el valor real nunca queda en ningun
+   archivo versionado.
+
+   HALLAZGO DE SEGURIDAD (corregido en esta revision): una version
+   anterior de este archivo tenia la Service Role Key real escrita en
+   texto plano aqui mismo. Si ese commit llego a subirse a un remoto
+   (GitHub, etc.), la llave debe considerarse comprometida: hay que
+   REGENERARLA de inmediato en Project Settings -> API -> Service Role
+   Key -> "Generate new key". Reescribir el archivo no revierte una
+   llave que ya fue expuesta -- solo rotarla en Supabase lo hace.
 ═══════════════════════════════════════════════════════════════ */
 
 create extension if not exists pg_net with schema extensions;
@@ -46,12 +67,26 @@ create or replace function public.fn_notificar_push()
 returns trigger
 language plpgsql
 as $$
+declare
+  v_service_key text;
 begin
+  select decrypted_secret into v_service_key
+  from vault.decrypted_secrets
+  where name = 'notificar_push_service_role_key'
+  limit 1;
+
+  -- Si el secreto todavia no se configuro en Vault, no truena el INSERT en
+  -- reportes_historial (eso rompería la creacion de reportes) -- solo se
+  -- omite el aviso push silenciosamente.
+  if v_service_key is null then
+    return new;
+  end if;
+
   perform net.http_post(
     url     := 'https://switfyozjhfceqysvcji.supabase.co/functions/v1/notificar-push',
     headers := jsonb_build_object(
                  'Content-type', 'application/json',
-                 'Authorization', 'Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3aXRmeW96amhmY2VxeXN2Y2ppIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MTMwMDE4NCwiZXhwIjoyMTA2ODc2MTg0fQ.woLhIZtBOL46QPvFeToDFXucC8V7buWCVW3wvz5T8Ak>'
+                 'Authorization', 'Bearer ' || v_service_key
                ),
     body    := jsonb_build_object(
                  'type', 'INSERT',

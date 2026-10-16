@@ -141,6 +141,9 @@
         <option value="atendido">Atendido</option>
         <option value="cerrado">Cerrado</option>
       </select>
+      <label style="display:flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;color:var(--text2);">
+        <input type="checkbox" id="f-foto"> Solo con foto
+      </label>
       <button class="btn-export" id="btn-export-csv">Exportar reportes (CSV)</button>
     </div>
     <div class="table-wrap">
@@ -149,7 +152,7 @@
           <tr>
             <th>Folio</th><th>Fecha</th><th>Hora</th>
             <th>Comedor</th><th>Categoría</th>
-            <th>Prioridad</th>
+            <th>Prioridad</th><th>Foto</th>
             <th>Situación</th><th>Estado</th><th>Detalle</th>
           </tr>
         </thead>

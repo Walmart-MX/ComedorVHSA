@@ -357,9 +357,16 @@ th{
 td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
 tr:hover td{background:#f7f9fc;}
 .td-folio{font-weight:800;color:var(--blue);cursor:pointer;}
+.td-foto{cursor:pointer;text-align:center;}
 .btn-ver-reporte{background:none;border:1px solid var(--blue);color:var(--blue);border-radius:6px;padding:4px 10px;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;}
 .btn-ver-reporte:hover{background:var(--blue);color:white;}
 .td-folio:hover{text-decoration:underline;}
+/* Texto solo para lectores de pantalla (ej. junto al icono de camara en la
+   tabla de reportes): visible para accesibilidad, invisible en pantalla. */
+.sr-only{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
 .status-select{
   padding:4px 8px;border:1px solid var(--border);
   border-radius:6px;font-size:.72rem;background:white;cursor:pointer;

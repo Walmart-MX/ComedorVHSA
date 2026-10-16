@@ -4,6 +4,7 @@ import {
   STATUS_LABELS, STATUS_BADGE, fechaLocalISO, escapeHtml
 } from './catalog.js';
 import { getCachedReportes } from './admin-dashboard.js';
+import { CAMERA_ICON } from './icons.js';
 
 let editingId = null;
 
@@ -13,6 +14,7 @@ export function initAdminTable() {
     el?.addEventListener('input', renderTabla);
     el?.addEventListener('change', renderTabla);
   });
+  document.getElementById('f-foto')?.addEventListener('change', renderTabla);
   document.getElementById('btn-export-csv')?.addEventListener('click', exportCSV);
   document.getElementById('btn-close-modal')?.addEventListener('click', closeModal);
   document.getElementById('m-status-sel')?.addEventListener('change', cambiarEstatusPendiente);
@@ -35,10 +37,12 @@ export function renderTabla() {
   const catF = document.getElementById('f-cat')?.value || '';
   const priF = document.getElementById('f-pri')?.value || '';
   const staF = document.getElementById('f-status')?.value || '';
+  const soloFoto = document.getElementById('f-foto')?.checked || false;
   if (search) r = r.filter(x => x.folio.toLowerCase().includes(search));
   if (catF) r = r.filter(x => x.categoria === catF);
   if (priF) r = r.filter(x => x.prioridad === priF);
   if (staF) r = r.filter(x => x.estatus === staF);
+  if (soloFoto) r = r.filter(x => !!x.foto_url);
   r = [...r].sort((a, b) => new Date(b.creado_en) - new Date(a.creado_en));
 
   document.getElementById('tabla-body').innerHTML = r.map(x => `
@@ -48,12 +52,13 @@ export function renderTabla() {
       <td>${COMEDOR_NAMES[x.comedor] || x.comedor}</td>
       <td>${escapeHtml(CAT_NAMES[x.categoria] || x.categoria)}</td>
       <td><span class="badge ${PRI_BADGE[x.prioridad]}">${PRI_LABELS[x.prioridad]}</span></td>
+      <td class="td-foto" data-id="${x.id}" title="${x.foto_url ? 'Con foto adjunta' : 'Sin foto'}">${x.foto_url ? `<span style="color:var(--blue);">${CAMERA_ICON}<span class="sr-only">Con foto adjunta</span></span>` : `<span aria-hidden="true" style="color:var(--text2);">\u2014</span>`}</td>
       <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(x.descripcion)}">${escapeHtml(x.descripcion)}</td>
       <td><span class="badge ${STATUS_BADGE[x.estatus]}">${STATUS_LABELS[x.estatus]}</span></td>
       <td><button type="button" class="btn-ver-reporte" data-id="${x.id}">Ver reporte</button></td>
     </tr>`).join('');
 
-  document.querySelectorAll('.td-folio, .btn-ver-reporte').forEach(el =>
+  document.querySelectorAll('.td-folio, .td-foto, .btn-ver-reporte').forEach(el =>
     el.addEventListener('click', () => openModal(Number(el.dataset.id))));
 }
 
@@ -164,13 +169,14 @@ async function guardarAccion() {
 
 function exportCSV() {
   const r = getCachedReportes();
-  const headers = ['Folio', 'Fecha', 'Comedor', 'Categoria', 'Prioridad', 'Situacion', 'Estado', 'Responsable', 'Accion implementada', 'Demo'];
+  const headers = ['Folio', 'Fecha', 'Comedor', 'Categoria', 'Prioridad', 'Situacion', 'Estado', 'Responsable', 'Accion implementada', 'Foto adjunta', 'Demo'];
   const csvCell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
   const rows = r.map(x => [
     x.folio, fechaLocalISO(x.creado_en),
     COMEDOR_NAMES[x.comedor] || x.comedor,
     CAT_NAMES[x.categoria] || x.categoria, x.prioridad,
     x.descripcion, x.estatus, x.responsable || '', x.accion || '',
+    x.foto_url ? 'SI' : 'NO',
     x.es_demo ? 'SI' : 'NO'
   ].map(csvCell).join(','));
   const csv = [headers.map(csvCell).join(','), ...rows].join('\n');
