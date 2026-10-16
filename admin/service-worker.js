@@ -4,7 +4,7 @@
    para la explicacion completa de la estrategia (es la misma aqui).
 ═══════════════════════════════════════════════════════════════ */
 
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const CACHE_NAME = `comedor-admin-${CACHE_VERSION}`;
 
 const SHELL_ASSETS = [
@@ -12,6 +12,9 @@ const SHELL_ASSETS = [
   './manifest.webmanifest',
   '../css/styles.css',
   '../icons/icon.svg',
+  '../icons/icon-admin-192.png',
+  '../icons/icon-admin-512.png',
+  '../icons/icon-admin-maskable-512.png',
   '../js/main-admin.js',
   '../js/auth.js',
   '../js/admin-dashboard.js',

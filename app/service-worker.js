@@ -14,7 +14,7 @@
    - NO hay cola de envio offline de reportes (decision explicita).
 ═══════════════════════════════════════════════════════════════ */
 
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const CACHE_NAME = `comedor-app-${CACHE_VERSION}`;
 
 const SHELL_ASSETS = [
@@ -22,6 +22,9 @@ const SHELL_ASSETS = [
   './manifest.webmanifest',
   '../css/styles.css',
   '../icons/icon.svg',
+  '../icons/icon-app-192.png',
+  '../icons/icon-app-512.png',
+  '../icons/icon-app-maskable-512.png',
   '../js/main-app.js',
   '../js/asociado.js',
   '../js/confirmacion.js',

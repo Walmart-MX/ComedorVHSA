@@ -8,7 +8,14 @@
 <meta name="description" content="Reporta de forma anónima situaciones del servicio de comedor del CEDIS Walmart Villahermosa.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="../icons/icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="../icons/icon.svg">
+<link rel="apple-touch-icon" href="../icons/icon-app-192.png">
+<!-- iOS no lee el manifest para "Agregar a inicio": sin estas 3 etiquetas,
+     Safari agrega un acceso directo que abre dentro de Safari (con barra de
+     direcciones), no como app de pantalla completa. -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Reportes del Comedor">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="../css/styles.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
