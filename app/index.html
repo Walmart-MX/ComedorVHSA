@@ -1,0 +1,293 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Reportes del Comedor - Walmart CEDIS</title>
+<meta name="theme-color" content="#0071CE">
+<meta name="description" content="Reporta de forma anónima situaciones del servicio de comedor del CEDIS Walmart Villahermosa.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="../icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../icons/icon.svg">
+<link rel="stylesheet" href="../css/styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div id="offline-banner" class="hidden" style="position:fixed;top:0;left:0;right:0;z-index:999;background:var(--text);color:white;text-align:center;padding:8px 16px;font-size:.78rem;font-weight:700;">
+  Sin conexión — puedes seguir viendo lo ya cargado, pero para enviar o consultar reportes necesitas internet.
+</div>
+<div id="pwa-update-banner" class="hidden" style="position:fixed;top:0;left:0;right:0;z-index:998;background:var(--blue-dark);color:white;text-align:center;padding:10px 16px;font-size:.8rem;font-weight:700;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;">
+  <span>Hay una versión nueva disponible.</span>
+  <button id="btn-pwa-actualizar" style="background:var(--yellow);color:var(--blue-dark);border:none;border-radius:8px;padding:4px 14px;font-weight:800;cursor:pointer;">Actualizar</button>
+</div>
+<div id="pwa-install-banner" class="hidden pwa-install-banner">
+  <span>Instala la app del comedor: acceso directo desde tu pantalla de inicio, sin buscarla en el navegador.</span>
+  <div class="pwa-install-actions">
+    <button type="button" id="btn-pwa-instalar" class="btn-primary" style="width:auto;padding:8px 18px;">Instalar app</button>
+    <button type="button" id="btn-pwa-instalar-cerrar" class="pwa-install-cerrar" aria-label="Cerrar aviso de instalación">&times;</button>
+  </div>
+</div>
+
+<div id="app-asociado">
+
+  <div id="backend-warning" class="hidden" style="background:#fff3cd;color:#664d03;padding:10px 16px;text-align:center;font-size:.78rem;font-weight:700;">
+    El sistema está en configuración: por ahora no es posible enviar reportes.
+  </div>
+
+  <!-- PASO 1: CATEGORÍA -->
+  <div id="step-1">
+    <div class="aso-header">
+      <div class="aso-logo"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#003087" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2v20M7 2a3 3 0 0 0-3 3v4a3 3 0 0 0 3 3M17 2a5 5 0 0 0-5 5v3a2 2 0 0 0 2 2h1v10"/></svg></div>
+      <h1>Reportes del Comedor</h1>
+      <p>Comedor — CEDIS Walmart Villahermosa</p>
+    </div>
+
+    <div style="padding:20px 16px 0;">
+      <div class="intro-card">
+        <p>¿Detectaste alguna situación en el comedor? Repórtala aquí para que podamos revisarla y darle seguimiento. <strong>Tu reporte es siempre 100% anónimo</strong>: nunca te pedimos nombre ni número de asociado.</p>
+      </div>
+
+      <button type="button" id="btn-ir-consulta" class="link-button">¿Ya registraste un reporte? Consulta su seguimiento aquí</button>
+
+      <div class="step-bar">
+        <div class="step-dot active" id="sd1">1</div>
+        <div class="step-line" id="sl1"></div>
+        <div class="step-dot" id="sd2">2</div>
+        <div class="step-line" id="sl2"></div>
+        <div class="step-dot" id="sd3">&#10003;</div>
+        <span class="step-label">Categoría → Datos → Listo</span>
+      </div>
+
+      <div class="step-title">¿Qué situación deseas reportar?</div>
+      <div class="cat-grid">
+        <div class="cat-card" role="button" tabindex="0" data-cat="temperatura">
+          <span class="cat-name">Temperatura</span>
+          <span class="cat-desc">Alimento muy frío, caliente o fuera de lo esperado</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="calidad">
+          <span class="cat-name">Calidad y frescura</span>
+          <span class="cat-desc">Alimento en mal estado o sin frescura</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="coccion">
+          <span class="cat-name">Cocción</span>
+          <span class="cat-desc">Alimento crudo, quemado o mal preparado</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="porcion">
+          <span class="cat-name">Porción</span>
+          <span class="cat-desc">Se sirvió una cantidad insuficiente o excesiva</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="objeto">
+          <span class="cat-name">Objeto extraño</span>
+          <span class="cat-desc">Materia u objeto extraño en los alimentos</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="limpieza">
+          <span class="cat-name">Limpieza</span>
+          <span class="cat-desc">Instalaciones o utensilios sin limpiar</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="espera">
+          <span class="cat-name">Tiempo de espera</span>
+          <span class="cat-desc">Espera prolongada para ser atendido</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="atencion">
+          <span class="cat-name">Atención</span>
+          <span class="cat-desc">Mal servicio o trato del personal</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="higiene">
+          <span class="cat-name">Higiene</span>
+          <span class="cat-desc">Personal sin equipo de protección adecuado</span>
+        </div>
+        <div class="cat-card" role="button" tabindex="0" data-cat="otra">
+          <span class="cat-name">Otra incidencia</span>
+          <span class="cat-desc">Cualquier otra situación que no esté en las categorías anteriores</span>
+        </div>
+      </div>
+
+      <div style="margin-bottom:24px;">
+        <button class="btn-primary" id="btn-step2" style="opacity:.5;pointer-events:none;">
+          Continuar →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 2: FORMULARIO (sin identificación -- el reporte siempre es anónimo) -->
+  <div id="step-2" class="hidden">
+    <div class="aso-header">
+      <div class="aso-logo"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#003087" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2v20M7 2a3 3 0 0 0-3 3v4a3 3 0 0 0 3 3M17 2a5 5 0 0 0-5 5v3a2 2 0 0 0 2 2h1v10"/></svg></div>
+      <h1>Reportes del Comedor</h1>
+      <p id="s2-cat-label">Categoría seleccionada</p>
+    </div>
+
+    <div style="padding:20px 16px 0;">
+      <div class="step-bar">
+        <div class="step-dot done" id="sd1b">&#10003;</div>
+        <div class="step-line done" id="sl1b"></div>
+        <div class="step-dot active" id="sd2b">2</div>
+        <div class="step-line" id="sl2b"></div>
+        <div class="step-dot" id="sd3b">3</div>
+        <span class="step-label">Categoría → Datos → Listo</span>
+      </div>
+
+      <div class="step-section">
+        <!-- Ubicacion -->
+        <div class="field-group-title">Ubicación</div>
+        <div class="form-field">
+          <label class="form-label">Comedor <span>*</span></label>
+          <select class="form-select" id="f-comedor">
+            <option value="">— Selecciona —</option>
+            <option value="secos">Comedor Secos</option>
+            <option value="perecederos">Comedor Perecederos</option>
+          </select>
+        </div>
+        <!-- Fecha/Hora auto -->
+        <div class="form-field">
+          <label class="form-label">Fecha y hora</label>
+          <div class="auto-field">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="f-datetime"></span>
+          </div>
+          <div class="form-hint">Se registra automáticamente</div>
+        </div>
+        <!-- Situacion -->
+        <div class="field-group-title">Situación</div>
+        <div class="form-field">
+          <label class="form-label">¿Qué sucedió? <span>*</span></label>
+          <textarea class="form-textarea" id="f-desc" placeholder="Describe qué sucedió, dónde ocurrió y cualquier detalle que ayude a revisar la situación."></textarea>
+        </div>
+        <!-- Foto -->
+        <div class="field-group-title">Evidencia (opcional)</div>
+        <div class="form-field">
+          <label class="form-label">Fotografía</label>
+          <div class="photo-area" id="photo-area">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue);margin:0 auto 6px;display:block;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <p>Toca para tomar una fotografía o seleccionar una imagen</p>
+            <small>Formatos JPG y PNG. Tamaño máximo: 5 MB.</small>
+          </div>
+          <input type="file" id="f-foto" accept="image/*" capture="environment" style="display:none;">
+          <img id="photo-preview" alt="Vista previa">
+          <button type="button" id="btn-remove-foto" class="btn-secondary hidden" style="margin-top:6px;width:auto;padding:6px 14px;font-size:.75rem;">Quitar foto</button>
+        </div>
+
+        <div class="form-hint" style="margin-bottom:14px;">Este reporte se envía de forma anónima: no se guarda tu nombre ni tu número de asociado.</div>
+
+        <button class="btn-primary" id="btn-enviar-reporte">Enviar reporte</button>
+        <button class="btn-secondary" id="btn-goback">← Cambiar categoría</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRMACIÓN -->
+  <div id="step-confirm" class="hidden">
+    <div class="confirm-wrap">
+      <div class="confirm-icon" id="confirm-icon"></div>
+      <h2>¡Tu reporte se registró correctamente!</h2>
+      <p>Gracias por contribuir a mejorar el servicio del comedor.</p>
+      <div class="folio-box">
+        <div class="folio-label">Folio de seguimiento</div>
+        <div class="folio-num" id="c-folio">—</div>
+        <button type="button" class="btn-secondary" id="btn-copiar-folio" style="width:auto;padding:6px 14px;font-size:.75rem;margin-top:10px;">Copiar folio</button>
+      </div>
+      <div class="confirm-detail">
+        <div class="confirm-row"><span>Categoría</span><span id="c-cat">—</span></div>
+        <div class="confirm-row"><span>Ubicación</span><span id="c-comedor">—</span></div>
+        <div class="confirm-row"><span>Fecha</span><span id="c-fecha">—</span></div>
+        <div class="confirm-row"><span>Estado</span><span id="c-estado">—</span></div>
+      </div>
+      <p style="font-size:.78rem;color:var(--text2);max-width:320px;">Guarda tu folio para consultar el estado de tu reporte en cualquier momento. Todo lo de aquí abajo es opcional.</p>
+
+      <div class="confirm-actions">
+        <a id="btn-whatsapp-confirmar" href="#" target="_blank" rel="noopener" class="action-card hidden">
+          <span class="action-card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.9-4.44 9.9-9.9 0-2.64-1.03-5.12-2.9-6.99A9.82 9.82 0 0 0 12.04 2zm0 1.67c2.11 0 4.1.82 5.59 2.32a7.89 7.89 0 0 1 2.31 5.91c0 4.56-3.72 8.26-8.27 8.26-1.44 0-2.86-.38-4.11-1.09l-.29-.17-3.11.82.83-3.04-.19-.31a8.18 8.18 0 0 1-1.26-4.38c0-4.56 3.71-8.32 8.5-8.32z"/></svg>
+          </span>
+          <span class="action-card-text">
+            <strong>Enviar por WhatsApp</strong>
+            <span>Comparte un resumen de tu folio con el equipo de comedor</span>
+          </span>
+        </a>
+
+        <button type="button" id="btn-abrir-atencion" class="action-card">
+          <span class="action-card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </span>
+          <span class="action-card-text">
+            <strong>Recibir atención personalizada</strong>
+            <span>Deja un teléfono ligado solo a este folio (opcional)</span>
+          </span>
+        </button>
+      </div>
+
+      <div id="atencion-form" class="hidden atencion-form">
+        <div class="form-field">
+          <label class="form-label" for="atencion-medio">¿Cómo prefieres que te contactemos?</label>
+          <select class="form-select" id="atencion-medio">
+            <option value="whatsapp">WhatsApp</option>
+            <option value="llamada">Llamada telefónica</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="atencion-contacto">Teléfono de contacto</label>
+          <input class="form-input" id="atencion-contacto" type="tel" inputmode="numeric" placeholder="Ej. 9931234567" maxlength="15">
+          <div class="form-hint">Este número se vincula solo a tu folio, nunca a una identidad dentro del sistema.</div>
+        </div>
+        <button type="button" class="btn-primary" id="btn-enviar-atencion" style="width:auto;padding:10px 22px;">Solicitar atención</button>
+        <p id="atencion-resultado" class="hidden form-hint" style="margin-top:8px;"></p>
+      </div>
+
+      <div id="push-opt-in" class="hidden" style="max-width:320px;margin-top:14px;padding:12px;background:var(--surface);border-radius:var(--radius-sm);">
+        <p style="font-size:.78rem;color:var(--text2);margin-bottom:8px;">Activa las notificaciones para recibir avisos cuando este folio cambie de estado.</p>
+        <button type="button" class="btn-secondary" id="btn-activar-notif-asociado" style="width:auto;padding:6px 14px;font-size:.75rem;">Activar notificaciones</button>
+        <p id="push-opt-in-resultado" class="hidden" style="font-size:.75rem;margin-top:6px;"></p>
+      </div>
+
+      <button class="btn-primary" id="btn-nuevo-reporte" style="margin-top:18px;max-width:280px;">Hacer otro reporte</button>
+    </div>
+  </div>
+
+  <!-- CONSULTAR REPORTE -->
+  <div id="step-consulta" class="hidden">
+    <div class="aso-header">
+      <h1>Consultar seguimiento</h1>
+      <p>Escribe el folio que recibiste al enviar tu reporte.</p>
+    </div>
+    <div style="padding:20px 16px 24px;">
+      <div class="form-field">
+        <label class="form-label" for="consulta-folio">Folio del reporte</label>
+        <input class="form-input" id="consulta-folio" type="text" placeholder="Ej. COM-2026-4F2A9C1B">
+      </div>
+      <button class="btn-primary" id="btn-consultar-folio">Consultar reporte</button>
+      <button class="btn-secondary" id="btn-volver-inicio-consulta" style="margin-top:10px;">← Volver al inicio</button>
+
+      <div id="consulta-cargando" class="hidden" style="margin-top:20px;font-size:.82rem;color:var(--text2);text-align:center;">Consultando información del reporte...</div>
+
+      <div id="consulta-no-encontrado" class="hidden" style="margin-top:20px;background:#fff3cd;color:#664d03;padding:14px;border-radius:10px;font-size:.82rem;">
+        No encontramos un reporte con ese folio. Verifica que lo hayas ingresado correctamente e inténtalo de nuevo.
+      </div>
+
+      <div id="consulta-resultado" class="hidden" style="margin-top:20px;">
+        <div class="confirm-detail">
+          <div class="confirm-row"><span>Folio</span><span id="q-folio">—</span></div>
+          <div class="confirm-row"><span>Categoría</span><span id="q-cat">—</span></div>
+          <div class="confirm-row"><span>Ubicación</span><span id="q-comedor">—</span></div>
+          <div class="confirm-row"><span>Fecha</span><span id="q-fecha">—</span></div>
+          <div class="confirm-row"><span>Última actualización</span><span id="q-actualizado">—</span></div>
+        </div>
+        <div class="detail-section" style="margin-top:16px;">
+          <h4>Estado actual</h4>
+          <p id="q-estado" style="font-size:.9rem;font-weight:700;color:var(--blue);">—</p>
+          <p id="q-desc" style="font-size:.82rem;color:var(--text2);margin-top:4px;">—</p>
+        </div>
+        <div class="detail-section" style="margin-top:16px;">
+          <h4>Historial de seguimiento</h4>
+          <div id="q-historial"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app-asociado -->
+
+<script type="module" src="../js/main-app.js"></script>
+</body>
+</html>

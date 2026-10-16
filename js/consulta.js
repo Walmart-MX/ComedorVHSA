@@ -28,7 +28,7 @@ async function buscarFolio() {
 }
 
 /** Entrada para deep links (?folio=XXX en la URL, ver service-worker.js /
-    js/main.js). Lleva al usuario directo a la pantalla de consulta con el
+    js/main-app.js). Lleva al usuario directo a la pantalla de consulta con el
     folio ya resuelto, sin que tenga que volver a escribirlo. */
 export function consultarFolioDesdeURL(folio) {
   mostrarConsulta();

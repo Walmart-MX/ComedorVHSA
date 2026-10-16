@@ -4,15 +4,16 @@
 // cada vez que se inserta una fila en reportes_historial -- es decir,
 // en CADA creacion de reporte y en CADA cambio de estatus.
 //
-// Reglas de negocio (ver conversacion con el cliente, fase 21):
-//   - Reporte nuevo (estatus_anterior IS NULL)      -> avisa a TODOS los
+// Reglas de negocio (actualizado: anonimato total, ver migracion
+// 20261010120000_anonimato_total.sql):
+//   - Reporte nuevo (estatus_anterior IS NULL) -> avisa a TODOS los
 //     admins con suscripcion activa.
-//   - Cambio de estatus de un reporte IDENTIFICADO  -> avisa solo al
-//     asociado dueño del reporte, solo si el nuevo estatus es
-//     revision/atendido/cerrado (no se notifica "pendiente", es el
-//     estado inicial, el asociado ya vio su confirmacion en pantalla).
-//   - Cambio de estatus de un reporte ANONIMO       -> NUNCA se notifica
-//     a nadie personalmente (por diseño: romperia el anonimato).
+//   - Cambio de estatus de CUALQUIER reporte   -> avisa a quien se haya
+//     suscrito a ESE folio en particular (tabla push_subscriptions,
+//     tipo='reporte'), si el nuevo estatus es revision/atendido/cerrado.
+//     La suscripcion nunca identifica a una persona -- solo "alguien
+//     con este navegador quiere avisos de este folio", por eso ya no
+//     importa si el reporte es anonimo o no: TODOS lo son.
 //
 // Variables de entorno requeridas (Supabase Secrets):
 //   VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT
@@ -60,7 +61,7 @@ Deno.serve(async (req) => {
 
     const { data: reporte, error } = await supabaseAdmin
       .from("reportes")
-      .select("folio, categoria, comedor, prioridad, numero_empleado, modo_reporte")
+      .select("folio, categoria, comedor, prioridad")
       .eq("id", reporte_id)
       .single();
 
@@ -68,10 +69,9 @@ Deno.serve(async (req) => {
 
     if (estatus_anterior === null) {
       await notificarAdmins(reporte);
-    } else if (reporte.modo_reporte === "personalizado" && reporte.numero_empleado) {
-      await notificarAsociado(reporte, estatus_nuevo);
+    } else {
+      await notificarPorFolio(reporte, estatus_nuevo);
     }
-    // Reporte anonimo con cambio de estatus: no se notifica a nadie (by design).
 
     return new Response("ok", { status: 200 });
   } catch (err) {
@@ -98,7 +98,7 @@ async function notificarAdmins(reporte: any) {
   await enviarATodos(subs || [], payload);
 }
 
-async function notificarAsociado(reporte: any, estatusNuevo: string) {
+async function notificarPorFolio(reporte: any, estatusNuevo: string) {
   const textos: Record<string, string> = {
     revision: `Tu reporte ${reporte.folio} está siendo revisado.`,
     atendido: `Tu reporte ${reporte.folio} fue atendido.`,
@@ -110,8 +110,8 @@ async function notificarAsociado(reporte: any, estatusNuevo: string) {
   const { data: subs } = await supabaseAdmin
     .from("push_subscriptions")
     .select("*")
-    .eq("tipo", "asociado")
-    .eq("numero_empleado", reporte.numero_empleado)
+    .eq("tipo", "reporte")
+    .eq("folio", reporte.folio)
     .eq("activa", true);
 
   const payload = JSON.stringify({

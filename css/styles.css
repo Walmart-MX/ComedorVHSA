@@ -109,9 +109,29 @@ button,select,input,textarea{font-family:inherit;}
 
 .link-button{background:none;border:none;padding:0;margin:4px 0 16px;color:var(--blue);font-size:.78rem;font-weight:700;text-decoration:underline;cursor:pointer;display:block;text-align:left;}
 
-#asociado-resultado{margin-top:10px;padding:10px 12px;border-radius:8px;font-size:.8rem;}
-#asociado-resultado.encontrado{background:#ecfdf5;color:#065f46;}
-#asociado-resultado.no-encontrado{background:#fff3cd;color:#664d03;}
+/* Opciones post-reporte: compartir por WhatsApp / pedir atencion personalizada.
+   Dos tarjetas iguales en forma (uno es <a>, el otro <button>) para que la
+   decision se sienta igual de valida sea cual sea la que elijan. */
+.confirm-actions{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;margin-top:16px;}
+.action-card{
+  display:flex;align-items:center;gap:12px;width:100%;
+  background:white;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  padding:13px 14px;text-align:left;text-decoration:none;color:var(--text);
+  font-family:inherit;cursor:pointer;transition:border-color .2s,background .2s;
+}
+.action-card:hover,.action-card:focus-visible{border-color:var(--blue);background:#eff6ff;}
+.action-card-icon{
+  flex-shrink:0;width:38px;height:38px;border-radius:50%;
+  background:#eff6ff;color:var(--blue);
+  display:flex;align-items:center;justify-content:center;
+}
+.action-card-text{display:flex;flex-direction:column;gap:2px;}
+.action-card-text strong{font-size:.86rem;}
+.action-card-text span{font-size:.72rem;color:var(--text2);}
+.atencion-form{
+  width:100%;max-width:320px;margin-top:12px;padding:14px;
+  background:var(--surface);border-radius:var(--radius-sm);text-align:left;
+}
 
 /* Grid categorías */
 .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;}
@@ -146,11 +166,6 @@ button,select,input,textarea{font-family:inherit;}
 }
 .form-textarea{resize:vertical;min-height:90px;}
 .form-hint{font-size:.68rem;color:var(--text2);margin-top:4px;}
-
-.modo-toggle{display:flex;gap:8px;}
-.modo-option{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 8px;border:2px solid #e2e2e2;border-radius:10px;cursor:pointer;font-size:.82rem;font-weight:600;transition:border-color .15s,background .15s;}
-.modo-option:has(input:checked){border-color:var(--blue);background:#eff6ff;}
-.modo-option input{margin:0;}
 
 /* Campo auto */
 .auto-field{
@@ -436,24 +451,6 @@ tr:hover td{background:#f7f9fc;}
   padding:6px 8px;
 }
 .pwa-install-cerrar:hover,.pwa-install-cerrar:focus-visible{opacity:.7;}
-
-/* ═══════════════════════════════════════════
-   ACCESO ADMIN — discreto, al pie de la pantalla del asociado.
-   Antes era un botón circular flotante siempre encima del contenido --
-   le daba demasiada prominencia a una funcion que solo el equipo de
-   comedor deberia usar, y confundia a los asociados ("¿que es ese
-   engrane?"). Ahora es un link de pie de pagina: el tamaño/posicion lo
-   hacen discreto, pero a proposito NO se le baja el contraste (opacity)
-   para no violar WCAG 2.2 -- sigue siendo perfectamente legible y
-   enfocable con teclado para quien sabe que esta ahi. */
-.app-footer-admin{text-align:center;padding:28px 16px 16px;}
-.admin-access-link{
-  background:none;border:none;color:var(--text2);
-  font-size:.72rem;cursor:pointer;
-  padding:8px 12px;text-decoration:underline;
-  text-underline-offset:2px;
-}
-.admin-access-link:hover,.admin-access-link:focus-visible{color:var(--blue);}
 
 .cfg-msg-ok{color:var(--green);font-weight:700;}
 .cfg-msg-error{color:var(--red);font-weight:700;}

@@ -2,7 +2,7 @@ import { getWhatsappDestino, actualizarWhatsappDestino, cargarConfiguracion } fr
 
 /** Pestaña "Configuración" del panel admin: hoy solo controla el número
     de WhatsApp al que los asociados pueden enviar el resumen de su reporte
-    (ver js/asociado.js). Si mañana se agregan más ajustes operativos,
+    (ver js/confirmacion.js). Si mañana se agregan más ajustes operativos,
     esta es la pestaña donde deberían vivir -- no un archivo nuevo por
     cada ajuste suelto (YAGNI: no creamos key/value genérico hasta que
     de verdad haga falta más de un ajuste). */
@@ -56,7 +56,7 @@ async function guardarWhatsapp() {
   }
   mostrarMensaje(
     numero
-      ? 'Número guardado. El botón de WhatsApp ya está activo para reportes "con mis datos de asociado".'
+      ? 'Número guardado. El botón de WhatsApp ya está activo en la pantalla de confirmación del asociado.'
       : 'Número eliminado. El botón de WhatsApp quedará oculto hasta configurar uno nuevo.',
     'ok'
   );

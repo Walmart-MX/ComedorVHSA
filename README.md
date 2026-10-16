@@ -1,12 +1,43 @@
 # Comedor VHSA — Reportes del Comedor
 
-App para que los asociados reporten situaciones del servicio de comedor de
-los CEDIS de Walmart México (temperatura, calidad, limpieza, tiempo de
-espera, etc.), con un panel de gestión de reportes del comedor para dar
-seguimiento.
+App para que los asociados reporten, **de forma 100% anónima**, situaciones del
+servicio de comedor de los CEDIS de Walmart México (temperatura, calidad,
+limpieza, tiempo de espera, etc.), con un panel de gestión independiente para
+dar seguimiento.
 
 Stack: HTML + CSS + JS vanilla (sin build step) hospedado en **GitHub Pages**,
 con **Supabase** como backend (Postgres + Auth + Storage).
+
+## Dos apps independientes (inspirado en TransQR)
+
+```
+/           Redirección a /app/ (compatibilidad con links/QR viejos)
+/app/       App pública del asociado -- formulario + consulta de folio
+/admin/     Panel administrativo -- dashboard, reportes, tendencias, QR
+```
+
+Cada una es su propia PWA instalable, con su propio `manifest.webmanifest` y
+`service-worker.js` (el *scope* de un Service Worker es la carpeta donde vive
+el archivo, así que uno nunca controla al otro). Ningún código del panel
+admin (login, gestión, exportaciones) viaja al navegador de un asociado que
+solo visita `/app/` -- y viceversa, `/admin/` no carga nada del flujo de
+reporte. `css/`, `icons/` y la mayoría de `js/` se comparten entre ambas
+(DRY) vía rutas relativas (`../css/styles.css`, `../js/catalog.js`, etc.);
+cada carpeta solo trae su propio `index.html`, `manifest.webmanifest` y
+`service-worker.js`.
+
+## Anonimato total
+
+El sistema **nunca** pide nombre ni número de asociado, en ningún punto del
+flujo. No existe un modo "con mis datos": todo reporte es anónimo, siempre.
+En la pantalla de confirmación, de forma completamente opcional, se puede:
+
+- **Compartir por WhatsApp** un resumen del folio (sin datos personales).
+- **Pedir atención personalizada**: dejar un teléfono de contacto ligado
+  *solo al folio* (tabla `reportes_atencion`), nunca a una identidad
+  persistente. El admin lo ve únicamente al abrir el detalle de ese reporte.
+- **Activar notificaciones** de cambios de estatus, también ligadas solo al
+  folio (`push_subscriptions`, tipo `reporte`), nunca a una persona.
 
 ## Estado del proyecto
 
@@ -29,23 +60,39 @@ con **Supabase** como backend (Postgres + Auth + Storage).
 ## Estructura
 
 ```
-index.html              Shell principal (markup, sin lógica inline)
-css/styles.css           Estilos (extraídos del prototipo original)
+index.html               Redirección a ./app/ (no es una app en sí misma)
+app/
+  index.html              Shell del formulario del asociado + consulta de folio
+  manifest.webmanifest    PWA del asociado
+  service-worker.js       Cache/offline del asociado
+admin/
+  index.html              Shell del panel administrativo
+  manifest.webmanifest    PWA del admin
+  service-worker.js       Cache/offline del admin
+css/styles.css            Estilos compartidos por ambas apps
+icons/icon.svg            Icono compartido por ambas apps
 js/
-  config.js              URL + anon key de Supabase (público, seguro de exponer)
-  supabase-client.js      Cliente de Supabase (ESM, vía esm.sh)
-  catalog.js              Catálogos centralizados (categorías, CEDIS, prioridades...)
-  app-config.js           Configuración editable desde el admin (hoy: número de WhatsApp)
+  config.js               URL + anon key de Supabase (compartido)
+  supabase-client.js      Cliente de Supabase (compartido, ESM)
+  catalog.js              Catálogos centralizados (compartido)
+  icons.js                Iconos SVG en línea (compartido)
+  app-config.js           Configuración editable desde el admin (número de WhatsApp)
+  pwa.js                  Registro de Service Worker + banners (compartido)
+  push.js                 Notificaciones push: por folio (asociado) y admin (compartido)
+  main-app.js             Punto de entrada de /app/
+  asociado.js              Flujo de reporte del asociado (100% anónimo)
+  confirmacion.js         Pantalla post-envío: WhatsApp, atención personalizada, push
+  consulta.js             Consulta pública de un reporte por folio
+  main-admin.js           Punto de entrada de /admin/
   auth.js                 Login/logout del panel admin (Supabase Auth)
-  asociado.js              Flujo de reporte del asociado
   admin-dashboard.js       KPIs y gráficas del dashboard
   admin-table.js          Tabla de reportes, filtros, CSV, modal de gestión
   admin-trends.js         Pestaña de tendencias
   admin-config.js         Pestaña "Configuración" (edita el número de WhatsApp)
-  qr.js                   Generación del QR para imprimir en el comedor
-  main.js                 Punto de entrada, conecta todo lo anterior
+  qr.js                   Generación del QR del comedor (pestaña "QR del comedor")
 supabase/
   migrations/             Esquema SQL (tablas, triggers, RLS, storage)
+  functions/notificar-push/  Edge Function de notificaciones push
 ```
 
 ## Pendiente para dejarlo 100% funcional
@@ -74,10 +121,21 @@ panel admin — ya no hay usuario/contraseña fijo en el código.
 
 Una vez tengamos `js/config.js` lleno, hacemos push y activo Pages
 (`main` branch, carpeta raíz). El sitio queda en:
-`https://walmart-mx.github.io/ComedorVHSA/`
+`https://walmart-mx.github.io/ComedorVHSA/` (redirige a `/app/`). El panel
+admin vive en `https://walmart-mx.github.io/ComedorVHSA/admin/` -- compártelo
+solo con el equipo de comedor, no hay ningún link hacia él desde `/app/`.
 
 ## Decisiones de diseño (vs. el prototipo original)
 
+- **Apps independientes** (inspirado en la separación `/app/` + `/admin/` de
+  TransQR): el formulario del asociado y el panel administrativo ya no
+  comparten una sola página con un password de JavaScript decidiendo qué
+  mostrar. Cada uno es su propia PWA, en su propia ruta.
+- **Anonimato total**: se eliminó por completo el número de asociado, el
+  nombre y el modo "con mis datos". Ya no existe la tabla `asociados` ni la
+  verificación contra ella -- nada en el sistema puede identificar a quien
+  reportó. Lo único voluntario es dejar un contacto *ligado al folio* para
+  pedir atención personalizada (ver `reportes_atencion`).
 - **Folios sin colisión y no adivinables**: generados por un trigger de
   Postgres con un código aleatorio (no un contador consecutivo ni un
   `localStorage` del navegador), para que la consulta pública por folio no
@@ -100,11 +158,8 @@ Una vez tengamos `js/config.js` lleno, hacemos push y activo Pages
   reportes, ya no con `Math.random()` como en el prototipo original.
 - **WhatsApp configurable sin tocar código**: el número de destino vive en
   la base de datos (tabla `app_config`) y se edita desde la pestaña
-  "Configuración" del panel admin. Antes estaba hardcodeado en
-  `js/config.js`: cambiarlo exigía un developer y un redeploy completo.
+  "Configuración" del panel admin. Ya no está condicionado a ningún "modo"
+  de reporte -- se ofrece siempre que haya un número configurado.
 - **Instalación de la app (PWA)**: banner inferior visible e inequívoco
   ("Instalar app"), en vez de un botón circular escondido en una esquina
   que casi nadie notaba.
-- **Acceso admin discreto**: ya no es un botón flotante siempre visible
-  encima del contenido del asociado -- es un link de pie de página, sin
-  perder accesibilidad (sin trucos de opacidad que violen contraste WCAG).

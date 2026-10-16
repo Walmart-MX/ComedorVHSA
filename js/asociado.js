@@ -1,29 +1,31 @@
+/* ═══════════════════════════════════════════════════════════════
+   Flujo de reporte del asociado -- 100% anónimo, sin excepción.
+   No se pide numero de asociado ni nombre en ningun punto: eliminar
+   esa friccion (y ese riesgo de privacidad) era el pedido explicito
+   del cliente. Lo que pasa DESPUES de guardar el reporte (compartir
+   por WhatsApp, pedir atencion personalizada, activar notificaciones)
+   vive en confirmacion.js -- este archivo solo arma y envia el reporte.
+═══════════════════════════════════════════════════════════════ */
+
 import { supabase, isSupabaseConfigured } from './supabase-client.js';
-import { CAT_NAMES, COMEDOR_NAMES, PRIORIDADES, STATUS_PUBLICO, DEFAULT_CEDIS, escapeHtml } from './catalog.js';
+import { PRIORIDADES, DEFAULT_CEDIS } from './catalog.js';
 import { CATEGORY_ICONS, CHECK_ICON } from './icons.js';
-import { getWhatsappDestino, cargarConfiguracion } from './app-config.js';
-import { activarNotificacionesAsociado, pushDisponible } from './push.js';
+import { mostrarConfirmacion } from './confirmacion.js';
 
 let currentCat = null;
 let currentFoto = null;
-// Datos del asociado ya verificados contra la base (numero_empleado, nombre, area).
-// null mientras no se haya verificado o el reporte sea anonimo.
-let asociadoVerificado = null;
 
 export function initAsociado() {
   document.getElementById('confirm-icon').innerHTML = CHECK_ICON;
   wireCategoryCards();
-  wireModoToggle();
   document.getElementById('btn-step2').addEventListener('click', goStep2);
   document.getElementById('btn-goback').addEventListener('click', goBack);
   document.getElementById('photo-area').addEventListener('click', () =>
     document.getElementById('f-foto').click());
   document.getElementById('f-foto').addEventListener('change', onFotoChange);
   document.getElementById('btn-remove-foto').addEventListener('click', removeFoto);
-  document.getElementById('btn-verificar-asociado').addEventListener('click', verificarAsociado);
   document.getElementById('btn-enviar-reporte').addEventListener('click', enviarReporte);
   document.getElementById('btn-nuevo-reporte').addEventListener('click', nuevoReporte);
-  document.getElementById('btn-copiar-folio').addEventListener('click', copiarFolio);
 }
 
 function wireCategoryCards() {
@@ -51,34 +53,11 @@ function selectCat(card) {
   btn.style.pointerEvents = 'auto';
 }
 
-/** Alterna los campos de identificacion segun el modo elegido (anonimo vs con mis datos). */
-function wireModoToggle() {
-  document.querySelectorAll('input[name="f-modo"]').forEach(radio =>
-    radio.addEventListener('change', actualizarVisibilidadModo));
-  actualizarVisibilidadModo();
-}
-
-function getModoActual() {
-  return document.querySelector('input[name="f-modo"]:checked')?.value || 'anonimo';
-}
-
-function actualizarVisibilidadModo() {
-  const esPersonalizado = getModoActual() === 'personalizado';
-  document.getElementById('campos-personalizados').classList.toggle('hidden', !esPersonalizado);
-  document.getElementById('modo-hint').textContent = esPersonalizado
-    ? 'Podremos identificarte para dar seguimiento a tu reporte.'
-    : 'Tu reporte no quedará asociado a tus datos personales en el sistema.';
-  if (!esPersonalizado) {
-    asociadoVerificado = null;
-    document.getElementById('asociado-resultado').classList.add('hidden');
-  }
-}
-
 function goStep2() {
   if (!currentCat) return;
   document.getElementById('step-1').classList.add('hidden');
   document.getElementById('step-2').classList.remove('hidden');
-  document.getElementById('s2-cat-label').textContent = CAT_NAMES[currentCat];
+  document.getElementById('s2-cat-label').textContent = document.querySelector(`.cat-card[data-cat="${currentCat}"] .cat-name`)?.textContent || '';
   document.getElementById('f-datetime').textContent = new Date().toLocaleString('es-MX');
 }
 
@@ -148,66 +127,17 @@ async function subirFoto() {
   }
 }
 
-/** Busca al asociado por numero de empleado. La base solo tiene numero,
-    nombre y area -- nunca telefono, por eso jamas se pide WhatsApp aqui. */
-async function verificarAsociado() {
-  const numero = document.getElementById('f-empleado').value.trim();
-  const box = document.getElementById('asociado-resultado');
-
-  if (!numero) {
-    asociadoVerificado = null;
-    box.className = 'no-encontrado';
-    box.textContent = 'Escribe tu número de asociado.';
-    box.classList.remove('hidden');
-    return;
-  }
-  if (!isSupabaseConfigured) return;
-
-  const btn = document.getElementById('btn-verificar-asociado');
-  btn.disabled = true;
-  btn.textContent = 'Buscando...';
-
-  const { data, error } = await supabase.rpc('buscar_asociado', { p_numero_empleado: numero });
-
-  btn.disabled = false;
-  btn.textContent = 'Verificar';
-
-  if (error || !data || data.length === 0) {
-    asociadoVerificado = null;
-    box.className = 'no-encontrado';
-    box.innerHTML = 'No encontramos un asociado con ese número. Verifica que sea correcto, o cambia a reporte anónimo arriba.';
-    box.classList.remove('hidden');
-    return;
-  }
-
-  asociadoVerificado = { numero_empleado: numero, nombre: data[0].nombre, area: data[0].area };
-  box.className = 'encontrado';
-  box.innerHTML = `Asociado identificado<br><strong>${escapeHtml(data[0].nombre)}</strong>${data[0].area ? ' — ' + escapeHtml(data[0].area) : ''}`;
-  box.classList.remove('hidden');
-}
-
 async function enviarReporte() {
   if (!isSupabaseConfigured) {
     alert('El sistema no está disponible en este momento. Intenta más tarde.');
     return;
   }
-  const modo = getModoActual();
   const comedor = document.getElementById('f-comedor').value;
   const descripcion = document.getElementById('f-desc').value.trim();
 
   if (!comedor || !descripcion) {
     alert('Completa el comedor y la descripción antes de enviar.');
     return;
-  }
-
-  let numero_empleado = null, nombre = null;
-  if (modo === 'personalizado') {
-    if (!asociadoVerificado) {
-      alert('Verifica tu número de asociado antes de continuar, o cambia a reporte anónimo.');
-      return;
-    }
-    numero_empleado = asociadoVerificado.numero_empleado;
-    nombre = asociadoVerificado.nombre;
   }
 
   const btn = document.getElementById('btn-enviar-reporte');
@@ -231,12 +161,9 @@ async function enviarReporte() {
         p_categoria: currentCat,
         p_cedis: DEFAULT_CEDIS,
         p_comedor: comedor,
-        p_nombre: nombre,
-        p_numero_empleado: numero_empleado,
         p_descripcion: descripcion,
         p_prioridad: PRIORIDADES[currentCat],
-        p_foto_url: foto_url,
-        p_modo_reporte: modo
+        p_foto_url: foto_url
       }),
       20000,
       'El envío del reporte tardó demasiado.'
@@ -244,19 +171,7 @@ async function enviarReporte() {
 
     if (error) throw error;
 
-    // Se vuelve a pedir la configuracion (en vez de confiar en el cache que
-    // cargo main.js al arrancar la pagina, sin esperarlo): si esa carga
-    // inicial todavia no terminaba quedaba un numero vacio en memoria y el
-    // boton de WhatsApp nunca aparecia aunque el admin ya lo hubiera
-    // configurado (hallazgo real reportado en pruebas). Si esto falla o
-    // tarda, NO debe bloquear la confirmacion -- el reporte ya se guardo.
-    try {
-      await conTimeout(cargarConfiguracion(), 4000, 'configuracion lenta');
-    } catch (err) {
-      console.error('No se pudo refrescar la configuración de WhatsApp:', err.message || err);
-    }
-
-    mostrarConfirmacion(data[0], modo);
+    mostrarConfirmacion(data[0]);
   } catch (err) {
     console.error(err);
     alert('No pudimos guardar tu reporte. Revisa tu conexión e intenta de nuevo.');
@@ -266,87 +181,9 @@ async function enviarReporte() {
   }
 }
 
-function mostrarConfirmacion(r, modo) {
-  document.getElementById('step-2').classList.add('hidden');
-  document.getElementById('step-confirm').classList.remove('hidden');
-  document.getElementById('c-folio').textContent = r.folio;
-  document.getElementById('c-cat').textContent = CAT_NAMES[r.categoria];
-  document.getElementById('c-comedor').textContent = COMEDOR_NAMES[r.comedor] || r.comedor;
-  document.getElementById('c-fecha').textContent = new Date(r.creado_en).toLocaleString('es-MX');
-  document.getElementById('c-estado').textContent = STATUS_PUBLICO[r.estatus] || r.estatus;
-
-  // Regla fundamental: WhatsApp SOLO para reportes "con mis datos". En modo
-  // anonimo jamas debe ofrecerse -- contradice el concepto de anonimato
-  // (aunque haya un numero de destino configurado). El reporte ya quedo
-  // guardado arriba en cualquier caso; WhatsApp es un canal adicional, nunca
-  // una condicion para registrar.
-  const whatsappBtn = document.getElementById('btn-whatsapp-confirmar');
-  const whatsappDestino = getWhatsappDestino();
-  if (modo === 'personalizado' && whatsappDestino) {
-    const resumen = `Reporte registrado en el sistema de comedor\nFolio: ${r.folio}\nCategoria: ${CAT_NAMES[r.categoria]}\nComedor: ${COMEDOR_NAMES[r.comedor] || r.comedor}\nFecha: ${new Date(r.creado_en).toLocaleString('es-MX')}`;
-    whatsappBtn.href = `https://wa.me/${whatsappDestino}?text=${encodeURIComponent(resumen)}`;
-    whatsappBtn.classList.remove('hidden');
-  } else {
-    whatsappBtn.classList.add('hidden');
-  }
-
-  mostrarOpcionNotificaciones(modo);
-}
-
-/** Ofrece notificaciones SOLO en modo personalizado, y SOLO si el
-    navegador/VAPID lo soportan -- nunca en modo anonimo (regla fundamental). */
-function mostrarOpcionNotificaciones(modo) {
-  const box = document.getElementById('push-opt-in');
-  if (modo !== 'personalizado' || !pushDisponible() || !asociadoVerificado) {
-    box.classList.add('hidden');
-    return;
-  }
-  box.classList.remove('hidden');
-  const btn = document.getElementById('btn-activar-notif-asociado');
-  const resultado = document.getElementById('push-opt-in-resultado');
-  const numero = asociadoVerificado.numero_empleado;
-
-  const handler = () => {
-    btn.disabled = true;
-    btn.textContent = 'Activando...';
-    activarNotificacionesAsociado(numero, (ok, motivo) => {
-      btn.disabled = false;
-      resultado.classList.remove('hidden');
-      if (ok) {
-        btn.classList.add('hidden');
-        resultado.textContent = 'Notificaciones activadas.';
-      } else {
-        btn.textContent = 'Activar notificaciones';
-        resultado.textContent = motivo === 'denegado'
-          ? 'No diste permiso de notificaciones. Puedes seguir consultando tu folio manualmente.'
-          : 'No se pudo activar en este momento.';
-      }
-    });
-  };
-  btn.replaceWith(btn.cloneNode(true)); // evita listeners duplicados entre reportes
-  document.getElementById('btn-activar-notif-asociado').addEventListener('click', handler);
-}
-
-function copiarFolio() {
-  const folio = document.getElementById('c-folio').textContent;
-  const btn = document.getElementById('btn-copiar-folio');
-  const original = btn.textContent;
-  navigator.clipboard?.writeText(folio).then(() => {
-    btn.textContent = 'Copiado';
-    setTimeout(() => { btn.textContent = original; }, 1500);
-  }).catch(() => {
-    alert(`Tu folio es: ${folio}`);
-  });
-}
-
 function nuevoReporte() {
   currentCat = null;
-  asociadoVerificado = null;
   document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
-  document.getElementById('f-empleado').value = '';
-  document.getElementById('asociado-resultado').classList.add('hidden');
-  document.getElementById('f-modo-anonimo').checked = true;
-  actualizarVisibilidadModo();
   document.getElementById('f-comedor').value = '';
   document.getElementById('f-desc').value = '';
   removeFoto();

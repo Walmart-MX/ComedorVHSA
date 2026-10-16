@@ -1,38 +1,27 @@
 import { supabase, isSupabaseConfigured } from './supabase-client.js';
 
 /**
- * Maneja login/logout del panel admin usando Supabase Auth
- * (reemplaza el usuario/contraseña fijo que traía el prototipo original).
+ * Login/logout del panel admin usando Supabase Auth. Vive en su propia
+ * app (admin/index.html), separada del formulario del asociado -- ya no
+ * hay nada que "mostrar/ocultar" entre dos experiencias en una sola
+ * página: aquí solo hay login o panel.
  */
 export function initAuth({ onLogin } = {}) {
-  const btnShowLogin = document.getElementById('btn-show-login');
-  const btnShowAsociado = document.getElementById('btn-show-asociado');
   const btnLogin = document.getElementById('btn-login');
   const btnLogout = document.getElementById('btn-logout');
   const errorBox = document.getElementById('l-error');
 
-  btnShowLogin?.addEventListener('click', showLogin);
-  btnShowAsociado?.addEventListener('click', showAsociado);
   btnLogin?.addEventListener('click', handleLogin);
   btnLogout?.addEventListener('click', handleLogout);
 
-  function showLogin() {
-    document.getElementById('app-asociado').style.display = 'none';
-    document.getElementById('app-login').classList.remove('hidden');
-    document.getElementById('btn-admin-wrap').style.display = 'none';
-  }
-
-  function showAsociado() {
-    document.getElementById('app-asociado').style.display = 'block';
-    document.getElementById('app-login').classList.add('hidden');
-    document.getElementById('btn-admin-wrap').style.display = 'block';
-  }
-
   function showAdminPanel() {
     document.getElementById('app-login').classList.add('hidden');
-    document.getElementById('app-asociado').style.display = 'none';
     document.getElementById('app-admin').classList.remove('hidden');
-    document.getElementById('btn-admin-wrap').style.display = 'none';
+  }
+
+  function showLogin() {
+    document.getElementById('app-admin').classList.add('hidden');
+    document.getElementById('app-login').classList.remove('hidden');
   }
 
   async function handleLogin() {
@@ -58,8 +47,7 @@ export function initAuth({ onLogin } = {}) {
 
   async function handleLogout() {
     await supabase.auth.signOut();
-    document.getElementById('app-admin').classList.add('hidden');
-    showAsociado();
+    showLogin();
   }
 
   // Si ya hay sesion activa (recarga de pagina), entrar directo al panel.

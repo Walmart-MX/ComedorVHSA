@@ -8,10 +8,10 @@
 
    Reglas de negocio que este archivo respeta (NO decide el permiso
    por el usuario, NO lo pide automaticamente):
-   - Anonimo:       nunca se ofrece activar notificaciones.
-   - Personalizado: se ofrece DESPUES de guardar el reporte (nunca
-     antes, nunca como requisito).
-   - Admin:         se ofrece solo despues de iniciar sesion real.
+   - Reporte: se ofrece DESPUES de guardarlo (nunca antes, nunca como
+     requisito), y la suscripcion se liga SOLO al folio -- nunca a una
+     identidad (todos los reportes son anonimos, ver asociado.js).
+   - Admin:   se ofrece solo despues de iniciar sesion real.
 ═══════════════════════════════════════════════════════════════ */
 
 import { supabase } from './supabase-client.js';
@@ -38,9 +38,10 @@ async function suscribirse() {
   });
 }
 
-/** Asociado identificado: se llama SOLO desde la pantalla de confirmacion,
-    SOLO en modo 'personalizado', y SOLO si el usuario toca el boton. */
-export async function activarNotificacionesAsociado(numeroEmpleado, onResultado) {
+/** Suscripcion ligada a UN folio en particular: se llama SOLO desde la
+    pantalla de confirmacion, SOLO si el usuario toca el boton. Nunca
+    conoce ni guarda quien es la persona -- solo el folio. */
+export async function activarNotificacionesReporte(folio, onResultado) {
   if (!soportaPush()) return onResultado?.(false, 'no-soportado');
   if (Notification.permission === 'denied') return onResultado?.(false, 'denegado');
 
@@ -50,8 +51,8 @@ export async function activarNotificacionesAsociado(numeroEmpleado, onResultado)
 
     const sub = await suscribirse();
     const json = sub.toJSON();
-    const { error } = await supabase.rpc('guardar_push_subscription_asociado', {
-      p_numero_empleado: numeroEmpleado,
+    const { error } = await supabase.rpc('guardar_push_subscription_reporte', {
+      p_folio: folio,
       p_endpoint: json.endpoint,
       p_p256dh: json.keys.p256dh,
       p_auth: json.keys.auth,
