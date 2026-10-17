@@ -86,6 +86,8 @@ async function wireWhatsapp(r) {
   btn.replaceWith(btn.cloneNode(true)); // evita listeners duplicados entre reportes
   btn = document.getElementById('btn-whatsapp-confirmar');
   btn.classList.add('hidden');
+  const explicacion = document.getElementById('whatsapp-explicacion');
+  explicacion?.classList.add('hidden');
 
   try {
     await Promise.race([
@@ -98,6 +100,7 @@ async function wireWhatsapp(r) {
 
   if (!getWhatsappDestino()) return;
   btn.classList.remove('hidden');
+  explicacion?.classList.remove('hidden');
   btn.addEventListener('click', () => compartirPorWhatsapp(r));
 }
 
