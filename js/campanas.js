@@ -19,7 +19,7 @@ import { renderBarChart } from './bar-chart.js';
 const LS_PREFIX = 'campana_voto_';
 
 export function initCampanas() {
-  document.getElementById('btn-ver-campanas')?.addEventListener('click', mostrarCampanas);
+  document.getElementById('campanas-banner')?.addEventListener('click', mostrarCampanas);
   document.getElementById('btn-volver-inicio-campanas')?.addEventListener('click', volverInicio);
   document.getElementById('campanas-contenido')?.addEventListener('click', onClickVotar);
   cargarBanner();
