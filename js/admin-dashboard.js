@@ -4,6 +4,7 @@ import {
   TREND_ICON, CLIPBOARD_ICON, CALENDAR_ICON, ALERT_CIRCLE_ICON,
   EYE_ICON, CHECK_CIRCLE_ICON, LOCK_ICON, ALERT_TRIANGLE_ICON, CLOCK_ICON
 } from './icons.js';
+import { renderKpiGrid } from './kpi-grid.js';
 
 let cachedReportes = [];
 
@@ -28,31 +29,13 @@ export async function cargarReportes() {
 
 export async function renderDashboard() {
   const r = await cargarReportes();
-  const hoy = fechaLocalISO(new Date());
-  const fechaDe = (x) => fechaLocalISO(x.creado_en);
-  const vencidos = r.filter(x =>
-    x.fecha_compromiso && x.fecha_compromiso < hoy &&
-    x.estatus !== 'atendido' && x.estatus !== 'cerrado'
-  ).length;
 
-  const kpis = [
-    { n: r.length, l: 'Total de reportes', c: '', icono: CLIPBOARD_ICON },
-    { n: r.filter(x => fechaDe(x) === hoy).length, l: 'Reportes hoy', c: '', icono: CALENDAR_ICON },
-    { n: r.filter(x => x.estatus === 'pendiente').length, l: 'Pendientes', c: 'red', icono: ALERT_CIRCLE_ICON },
-    { n: r.filter(x => x.estatus === 'revision').length, l: 'En revisión', c: 'amber', icono: EYE_ICON },
-    { n: r.filter(x => x.estatus === 'atendido').length, l: 'Atendidos', c: 'green', icono: CHECK_CIRCLE_ICON },
-    { n: r.filter(x => x.estatus === 'cerrado').length, l: 'Cerrados', c: '', icono: LOCK_ICON },
-    { n: vencidos, l: 'Vencidos', c: vencidos > 0 ? 'red' : '', icono: ALERT_TRIANGLE_ICON },
-    { n: tiempoPromedioGlobal(r), l: 'Tiempo promedio de atención (días)', c: '', icono: CLOCK_ICON }
-  ];
-  document.getElementById('kpi-grid').innerHTML = kpis.map(k => `
-    <div class="kpi-card ${k.c}">
-      <div class="kpi-icon">${k.icono}</div>
-      <div class="kpi-body">
-        <div class="kpi-num">${escapeHtml(k.n)}</div>
-        <div class="kpi-label">${escapeHtml(k.l)}</div>
-      </div>
-    </div>`).join('');
+  // Indicadores: uno global y uno por nave (secos/perecederos), misma
+  // tarjeta y misma fórmula para los tres -- construirKpis() no sabe ni
+  // le importa si la lista que recibe ya viene filtrada por comedor.
+  renderKpiGrid('kpi-grid', construirKpis(r));
+  renderKpiGrid('kpi-grid-secos', construirKpis(r.filter(x => x.comedor === 'secos')));
+  renderKpiGrid('kpi-grid-perecederos', construirKpis(r.filter(x => x.comedor === 'perecederos')));
 
   renderBarChart('chart-cat', agruparPor(r, 'categoria', CAT_NAMES));
   renderBarChart('chart-dias', ultimosDias(r));
@@ -66,8 +49,32 @@ export async function renderDashboard() {
   renderTendenciaAlert(r);
 }
 
-/** Tiempo promedio real (días) entre creación y última actualización de reportes ya atendidos/cerrados. */
-function tiempoPromedioGlobal(r) {
+/** Arma el set de 8 indicadores a partir de CUALQUIER lista de reportes --
+    la lista completa para el indicador global, o ya filtrada por comedor
+    para el indicador de una nave. Una sola fórmula, nunca duplicada. */
+function construirKpis(lista) {
+  const hoy = fechaLocalISO(new Date());
+  const fechaDe = (x) => fechaLocalISO(x.creado_en);
+  const vencidos = lista.filter(x =>
+    x.fecha_compromiso && x.fecha_compromiso < hoy &&
+    x.estatus !== 'atendido' && x.estatus !== 'cerrado'
+  ).length;
+  return [
+    { n: lista.length, l: 'Total de reportes', c: '', icono: CLIPBOARD_ICON },
+    { n: lista.filter(x => fechaDe(x) === hoy).length, l: 'Reportes hoy', c: '', icono: CALENDAR_ICON },
+    { n: lista.filter(x => x.estatus === 'pendiente').length, l: 'Pendientes', c: 'red', icono: ALERT_CIRCLE_ICON },
+    { n: lista.filter(x => x.estatus === 'revision').length, l: 'En revisión', c: 'amber', icono: EYE_ICON },
+    { n: lista.filter(x => x.estatus === 'atendido').length, l: 'Atendidos', c: 'green', icono: CHECK_CIRCLE_ICON },
+    { n: lista.filter(x => x.estatus === 'cerrado').length, l: 'Cerrados', c: '', icono: LOCK_ICON },
+    { n: vencidos, l: 'Vencidos', c: vencidos > 0 ? 'red' : '', icono: ALERT_TRIANGLE_ICON },
+    { n: tiempoPromedioGlobal(lista), l: 'Tiempo promedio de atención (días)', c: '', icono: CLOCK_ICON }
+  ];
+}
+
+/** Tiempo promedio real (días) entre creación y última actualización de
+    reportes ya atendidos/cerrados. Exportada porque admin-trends.js la
+    reutiliza para su propio indicador -- misma fórmula, un solo lugar. */
+export function tiempoPromedioGlobal(r) {
   const atendidos = r.filter(x => x.estatus === 'atendido' || x.estatus === 'cerrado');
   if (atendidos.length === 0) return 'N/A';
   const totalDias = atendidos.reduce((acc, x) => {

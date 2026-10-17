@@ -1,15 +1,24 @@
 import { CAT_NAMES, escapeHtml } from './catalog.js';
-import { getCachedReportes } from './admin-dashboard.js';
-import { TREND_ICON } from './icons.js';
+import { getCachedReportes, tiempoPromedioGlobal } from './admin-dashboard.js';
+import { TREND_ICON, CLIPBOARD_ICON, CLOCK_ICON, CHECK_CIRCLE_ICON } from './icons.js';
+import { renderKpiGrid } from './kpi-grid.js';
+
+/* Peso de cada tendencia posible, de "ninguna novedad" a "urgente". Vive a
+   nivel de módulo porque lo usan dos funciones (el resumen de texto y la
+   tarjeta KPI "Categoría en tendencia") -- una sola fuente de verdad en
+   vez de repetir el mismo mapa dos veces. */
+const PESO_TENDENCIA = { 'incremento significativo': 3, 'pico reciente': 2, 'subiendo': 1, 'bajando': 0, 'estable': 0 };
 
 export function renderTendencias() {
   const r = getCachedReportes();
   const now = Date.now();
   const porCategoria = construirEvolucionSemanal(r, now);
+  const horarioPico = calcularHorarios(r);
 
+  renderKpisTendencias(r, porCategoria, horarioPico);
   renderResumenTendencias(porCategoria);
   renderEvolucionSemanal(porCategoria);
-  renderHorarios(r);
+  renderHorariosChart(horarioPico);
   renderTiempoPorCategoria(r);
 }
 
@@ -24,6 +33,44 @@ function construirEvolucionSemanal(r, now) {
     porCategoria[x.categoria][semIdx]++;
   });
   return porCategoria;
+}
+
+/** Indicadores de la pestaña Tendencias: total del periodo, categoría con
+    la tendencia más relevante, horario pico y tiempo promedio de atención
+    (esta última reutiliza la MISMA fórmula que el dashboard general --
+    ver admin-dashboard.js -- en vez de recalcularla aquí). */
+function renderKpisTendencias(r, porCategoria, horarioPico) {
+  const totalPeriodo = Object.values(porCategoria).reduce((acc, v) => acc + v.reduce((a, b) => a + b, 0), 0);
+  const mejor = obtenerMejorTendencia(porCategoria);
+  const hayTendencia = mejor && PESO_TENDENCIA[mejor.tendencia] > 0;
+
+  const colorPorTendencia = { 'incremento significativo': 'red', 'pico reciente': 'amber', 'subiendo': 'amber' };
+
+  const kpis = [
+    { n: totalPeriodo, l: 'Reportes (últimas 4 semanas)', c: '', icono: CLIPBOARD_ICON },
+    {
+      n: hayTendencia ? (CAT_NAMES[mejor.cat] || mejor.cat) : 'Sin cambios',
+      l: 'Categoría en tendencia',
+      c: hayTendencia ? (colorPorTendencia[mejor.tendencia] || '') : 'green',
+      icono: TREND_ICON
+    },
+    { n: horarioPico.picoValor > 0 ? `${horarioPico.rango}h` : 'N/A', l: 'Horario con más reportes', c: '', icono: CLOCK_ICON },
+    { n: tiempoPromedioGlobal(r), l: 'Tiempo promedio de atención (días)', c: '', icono: CHECK_CIRCLE_ICON }
+  ];
+  renderKpiGrid('kpi-grid-tendencias', kpis);
+}
+
+/** La categoría cuya tendencia pesa más (ver PESO_TENDENCIA), o null si no
+    hay ninguna con reportes en el periodo. Compartida entre el resumen de
+    texto y la tarjeta KPI -- un solo recorrido, no dos. */
+function obtenerMejorTendencia(porCategoria) {
+  let mejor = null;
+  Object.entries(porCategoria).forEach(([cat, valores]) => {
+    if (valores.reduce((a, b) => a + b, 0) === 0) return;
+    const tendencia = calcularTendencia(valores);
+    if (!mejor || PESO_TENDENCIA[tendencia] > PESO_TENDENCIA[mejor.tendencia]) mejor = { cat, tendencia };
+  });
+  return mejor;
 }
 
 function renderEvolucionSemanal(porCategoria) {
@@ -80,15 +127,9 @@ function renderResumenTendencias(porCategoria) {
     return;
   }
 
-  const peso = { 'incremento significativo': 3, 'pico reciente': 2, 'subiendo': 1, 'bajando': 0, 'estable': 0 };
-  let mejor = null;
-  Object.entries(porCategoria).forEach(([cat, valores]) => {
-    if (valores.reduce((a, b) => a + b, 0) === 0) return;
-    const tendencia = calcularTendencia(valores);
-    if (!mejor || peso[tendencia] > peso[mejor.tendencia]) mejor = { cat, tendencia };
-  });
+  const mejor = obtenerMejorTendencia(porCategoria);
 
-  if (!mejor || peso[mejor.tendencia] === 0) {
+  if (!mejor || PESO_TENDENCIA[mejor.tendencia] === 0) {
     text.innerHTML = '<strong>Comportamiento estable</strong>No se detectan incrementos relevantes en las categorías de reporte durante las últimas 4 semanas.';
     return;
   }
@@ -104,8 +145,10 @@ function renderResumenTendencias(porCategoria) {
 
 /** Hora LOCAL del navegador (no UTC crudo), para que el horario pico
     corresponda a la hora real de operacion del comedor, sin importar
-    como venga serializado el timestamp desde Supabase. */
-function renderHorarios(r) {
+    como venga serializado el timestamp desde Supabase. Separado del
+    render del chart para poder reutilizar el mismo cálculo en la
+    tarjeta KPI "Horario con más reportes" (ver renderKpisTendencias). */
+function calcularHorarios(r) {
   const rangos = ['06-08', '08-10', '10-12', '12-14', '14-16', '16-18', '18-20', '20-22'];
   const horarios = Object.fromEntries(rangos.map(k => [k, 0]));
   r.forEach(x => {
@@ -116,10 +159,14 @@ function renderHorarios(r) {
     });
     if (rango) horarios[rango]++;
   });
-  const max = Math.max(...Object.values(horarios), 1);
   const picoValor = Math.max(...Object.values(horarios));
+  const rango = rangos.find(k => horarios[k] === picoValor) || null;
+  return { horarios, rango, picoValor };
+}
+
+function renderHorariosChart({ horarios, picoValor }) {
   document.getElementById('chart-horario').innerHTML = Object.entries(horarios).map(([k, v]) => `
-    <div class="bar-row"><div class="bar-label">${k}h</div><div class="bar-track"><div class="bar-fill ${v === picoValor && v > 0 ? 'red' : ''}" style="width:${Math.round(v / max * 100)}%"></div></div><div class="bar-val">${v}</div></div>`).join('');
+    <div class="bar-row"><div class="bar-label">${k}h</div><div class="bar-track"><div class="bar-fill ${v === picoValor && v > 0 ? 'red' : ''}" style="width:${Math.round(v / Math.max(picoValor, 1) * 100)}%"></div></div><div class="bar-val">${v}</div></div>`).join('');
 }
 
 /** Tiempo de atención REAL por categoría (el prototipo original lo simulaba con Math.random). */

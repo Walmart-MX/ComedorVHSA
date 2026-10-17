@@ -292,6 +292,8 @@ button,select,input,textarea{font-family:inherit;}
 /* KPI cards -- icono en círculo de color + número grande + etiqueta, en
    vez de solo un borde de color arriba: se identifica cada tarjeta de un
    vistazo sin tener que leer la etiqueta primero. */
+.kpi-section-title{font-size:.9rem;font-weight:800;color:var(--text);margin:18px 0 10px;}
+.kpi-section-title:first-of-type{margin-top:0;}
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:14px;margin-bottom:24px;}
 .kpi-card{
   background:white;border-radius:var(--radius-sm);

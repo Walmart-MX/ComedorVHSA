@@ -9,7 +9,7 @@ import { CAMERA_ICON } from './icons.js';
 let editingId = null;
 
 export function initAdminTable() {
-  ['f-search', 'f-cat', 'f-pri', 'f-status'].forEach(id => {
+  ['f-search', 'f-comedor', 'f-cat', 'f-pri', 'f-status'].forEach(id => {
     const el = document.getElementById(id);
     el?.addEventListener('input', renderTabla);
     el?.addEventListener('change', renderTabla);
@@ -34,11 +34,13 @@ function formatHora(creadoEn) {
 export function renderTabla() {
   let r = getCachedReportes();
   const search = document.getElementById('f-search')?.value.toLowerCase() || '';
+  const comedorF = document.getElementById('f-comedor')?.value || '';
   const catF = document.getElementById('f-cat')?.value || '';
   const priF = document.getElementById('f-pri')?.value || '';
   const staF = document.getElementById('f-status')?.value || '';
   const soloFoto = document.getElementById('f-foto')?.checked || false;
   if (search) r = r.filter(x => x.folio.toLowerCase().includes(search));
+  if (comedorF) r = r.filter(x => x.comedor === comedorF);
   if (catF) r = r.filter(x => x.categoria === catF);
   if (priF) r = r.filter(x => x.prioridad === priF);
   if (staF) r = r.filter(x => x.estatus === staF);

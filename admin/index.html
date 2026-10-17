@@ -91,7 +91,16 @@
       <div class="icon" id="trend-alert-icon"></div>
       <p><strong>Tendencia detectada</strong>Incremento de reportes de <strong>Temperatura</strong> en las últimas 3 semanas. Se recomienda revisión del equipo de mantenimiento.</p>
     </div>
+
+    <h3 class="kpi-section-title">Indicadores globales</h3>
     <div class="kpi-grid" id="kpi-grid"></div>
+
+    <h3 class="kpi-section-title">Comedor Secos</h3>
+    <div class="kpi-grid" id="kpi-grid-secos"></div>
+
+    <h3 class="kpi-section-title">Comedor Perecederos</h3>
+    <div class="kpi-grid" id="kpi-grid-perecederos"></div>
+
     <div class="charts-grid">
       <div class="chart-card">
         <div class="chart-title">Reportes por categoría</div>
@@ -116,6 +125,11 @@
   <div id="tab-reportes" class="admin-content hidden">
     <div class="table-filters">
       <input class="filter-input" type="text" placeholder="Buscar folio..." id="f-search" style="width:130px;">
+      <select class="filter-select" id="f-comedor">
+        <option value="">Todas las naves</option>
+        <option value="secos">Comedor Secos</option>
+        <option value="perecederos">Comedor Perecederos</option>
+      </select>
       <select class="filter-select" id="f-cat">
         <option value="">Todas las categorías</option>
         <option value="temperatura">Temperatura</option>
@@ -164,6 +178,7 @@
 
   <!-- TENDENCIAS -->
   <div id="tab-tendencias" class="admin-content hidden">
+    <div class="kpi-grid" id="kpi-grid-tendencias"></div>
     <div class="trend-alert" id="trend-alert-tendencias" style="display:none;">
       <div class="icon" id="trend-alert-tendencias-icon"></div>
       <p id="trend-alert-tendencias-text"></p>
