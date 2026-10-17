@@ -1,6 +1,9 @@
 import { supabase, isSupabaseConfigured } from './supabase-client.js';
 import { CAT_NAMES, COMEDOR_NAMES, fechaLocalISO, escapeHtml } from './catalog.js';
-import { TREND_ICON } from './icons.js';
+import {
+  TREND_ICON, CLIPBOARD_ICON, CALENDAR_ICON, ALERT_CIRCLE_ICON,
+  EYE_ICON, CHECK_CIRCLE_ICON, LOCK_ICON, ALERT_TRIANGLE_ICON, CLOCK_ICON
+} from './icons.js';
 
 let cachedReportes = [];
 
@@ -33,18 +36,23 @@ export async function renderDashboard() {
   ).length;
 
   const kpis = [
-    { n: r.length, l: 'Total de reportes', c: '' },
-    { n: r.filter(x => fechaDe(x) === hoy).length, l: 'Reportes hoy', c: '' },
-    { n: r.filter(x => x.estatus === 'pendiente').length, l: 'Pendientes', c: 'red' },
-    { n: r.filter(x => x.estatus === 'revision').length, l: 'En revisión', c: 'amber' },
-    { n: r.filter(x => x.estatus === 'atendido').length, l: 'Atendidos', c: 'green' },
-    { n: r.filter(x => x.estatus === 'cerrado').length, l: 'Cerrados', c: '' },
-    { n: vencidos, l: 'Vencidos', c: vencidos > 0 ? 'red' : '' },
-    { n: tiempoPromedioGlobal(r), l: 'Tiempo promedio de atención (días)', c: '' }
+    { n: r.length, l: 'Total de reportes', c: '', icono: CLIPBOARD_ICON },
+    { n: r.filter(x => fechaDe(x) === hoy).length, l: 'Reportes hoy', c: '', icono: CALENDAR_ICON },
+    { n: r.filter(x => x.estatus === 'pendiente').length, l: 'Pendientes', c: 'red', icono: ALERT_CIRCLE_ICON },
+    { n: r.filter(x => x.estatus === 'revision').length, l: 'En revisión', c: 'amber', icono: EYE_ICON },
+    { n: r.filter(x => x.estatus === 'atendido').length, l: 'Atendidos', c: 'green', icono: CHECK_CIRCLE_ICON },
+    { n: r.filter(x => x.estatus === 'cerrado').length, l: 'Cerrados', c: '', icono: LOCK_ICON },
+    { n: vencidos, l: 'Vencidos', c: vencidos > 0 ? 'red' : '', icono: ALERT_TRIANGLE_ICON },
+    { n: tiempoPromedioGlobal(r), l: 'Tiempo promedio de atención (días)', c: '', icono: CLOCK_ICON }
   ];
-  document.getElementById('kpi-grid').innerHTML = kpis.map(k =>
-    `<div class="kpi-card ${k.c}"><div class="kpi-num">${escapeHtml(k.n)}</div><div class="kpi-label">${escapeHtml(k.l)}</div></div>`
-  ).join('');
+  document.getElementById('kpi-grid').innerHTML = kpis.map(k => `
+    <div class="kpi-card ${k.c}">
+      <div class="kpi-icon">${k.icono}</div>
+      <div class="kpi-body">
+        <div class="kpi-num">${escapeHtml(k.n)}</div>
+        <div class="kpi-label">${escapeHtml(k.l)}</div>
+      </div>
+    </div>`).join('');
 
   renderBarChart('chart-cat', agruparPor(r, 'categoria', CAT_NAMES));
   renderBarChart('chart-dias', ultimosDias(r));
@@ -101,12 +109,15 @@ function renderBarChart(elementId, items) {
   const el = document.getElementById(elementId);
   if (!el) return;
   const max = Math.max(...items.map(i => i.valor), 1);
-  el.innerHTML = items.map(i => `
+  el.innerHTML = items.map(i => {
+    const porcentaje = Math.round(i.valor / max * 100);
+    return `
     <div class="bar-row">
-      <div class="bar-label">${escapeHtml(i.label)}</div>
-      <div class="bar-track"><div class="bar-fill ${i.clase}" style="width:${Math.round(i.valor / max * 100)}%"></div></div>
+      <div class="bar-label" title="${escapeHtml(i.label)}">${escapeHtml(i.label)}</div>
+      <div class="bar-track" title="${porcentaje}% del máximo"><div class="bar-fill ${i.clase}" style="width:${porcentaje}%"></div></div>
       <div class="bar-val">${i.valor}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 /** Alerta de tendencia: compara últimos 7 días vs los 7 anteriores por categoría. */
