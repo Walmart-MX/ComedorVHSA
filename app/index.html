@@ -55,6 +55,12 @@
         <p>¿Detectaste alguna situación en el comedor? Repórtala aquí para que podamos revisarla y darle seguimiento. <strong>Tu reporte es siempre 100% anónimo</strong>: nunca te pedimos nombre ni número de asociado.</p>
       </div>
 
+      <button type="button" id="campanas-banner" class="hidden campanas-banner">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 0 1-5.8-1.6"/></svg>
+        <span id="campanas-banner-titulo">Tenemos novedades para ti</span>
+        <span class="campanas-banner-cta">Ver →</span>
+      </button>
+
       <button type="button" id="btn-ir-consulta" class="link-button">¿Ya registraste un reporte? Consulta su seguimiento aquí</button>
 
       <div class="step-bar">
@@ -262,6 +268,18 @@
           <div id="q-historial"></div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- CAMPAÑAS: avisos y encuestas vigentes -->
+  <div id="step-campanas" class="hidden">
+    <div class="aso-header">
+      <h1>Avisos y encuestas</h1>
+      <p>Novedades del comedor para ti.</p>
+    </div>
+    <div style="padding:20px 16px 24px;">
+      <div id="campanas-contenido"></div>
+      <button type="button" class="btn-secondary" id="btn-volver-inicio-campanas" style="margin-top:16px;">← Volver al inicio</button>
     </div>
   </div>
 

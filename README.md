@@ -40,6 +40,25 @@ En la pantalla de confirmación, de forma completamente opcional, se puede:
   archivos reales vía enlace, solo texto precargado).
 - **Activar notificaciones** de cambios de estatus, ligadas solo al folio
   (`push_subscriptions`, tipo `reporte`), nunca a una persona.
+
+## Campañas (avisos y encuestas)
+
+Desde el panel admin (pestaña "Campañas") se pueden publicar dos tipos de
+contenido para los asociados, ver `20261011120000_campanas.sql`:
+
+- **Avisos**: solo informativos (ej. mantenimiento, cierre temporal).
+- **Encuestas**: el asociado elige una opción (ej. menú de la próxima
+  semana) y ve el resultado acumulado de inmediato después de votar.
+
+Ambos tienen fecha de inicio/fin -- se muestran solos mientras están
+vigentes, sin que el admin tenga que recordar apagarlos. Los votos siguen
+el mismo principio de anonimato total: una fila es solo
+`{campana_id, opcion, fecha}`, nada que identifique a quien votó. El
+control de "un voto por persona" es a propósito **solo del lado del
+cliente** (una marca en `localStorage` del navegador) -- guardar un
+identificador de dispositivo en el servidor habría roto esa misma
+política de anonimato, así que se aceptó ese trade-off conscientemente.
+
 - [x] Esquema de base de datos (`supabase/migrations/`) -- confirmado en
       vivo: `guardar_push_subscription_reporte` responde con el error de
       negocio esperado (folio no encontrado) para un folio sintético, lo

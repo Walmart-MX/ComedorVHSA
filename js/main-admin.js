@@ -8,6 +8,7 @@ import { initAdminTable, renderTabla, abrirReportePorFolio } from './admin-table
 import { renderTendencias } from './admin-trends.js';
 import { initAdminConfig, renderConfigTab } from './admin-config.js';
 import { initAdminPassword } from './admin-password.js';
+import { initAdminCampanas, renderCampanasTab } from './admin-campanas.js';
 import { cargarConfiguracion } from './app-config.js';
 import { initPWA } from './pwa.js';
 import { renderQR, initQR } from './qr.js';
@@ -30,6 +31,7 @@ cargarConfiguracion();
 initAdminTable();
 initAdminConfig();
 initAdminPassword();
+initAdminCampanas();
 initQR();
 initAuth({ onLogin: onAdminLogin });
 initPWA();
@@ -81,11 +83,12 @@ function manejarDeepLink() {
 function showAdminTab(name, el) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  ['dashboard', 'reportes', 'tendencias', 'config', 'qr'].forEach(t => {
+  ['dashboard', 'reportes', 'tendencias', 'campanas', 'config', 'qr'].forEach(t => {
     document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
   });
   if (name === 'reportes') renderTabla();
   if (name === 'tendencias') renderTendencias();
+  if (name === 'campanas') renderCampanasTab();
   if (name === 'config') renderConfigTab();
   if (name === 'qr') renderQR();
 }

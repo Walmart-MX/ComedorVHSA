@@ -81,6 +81,7 @@
     <div class="nav-tab active" data-tab="dashboard">Resumen general</div>
     <div class="nav-tab" data-tab="reportes">Reportes</div>
     <div class="nav-tab" data-tab="tendencias">Análisis de tendencias</div>
+    <div class="nav-tab" data-tab="campanas">Campañas</div>
     <div class="nav-tab" data-tab="qr">QR del comedor</div>
     <div class="nav-tab" data-tab="config">Configuración</div>
   </div>
@@ -197,6 +198,51 @@
         <div class="bar-chart" id="chart-tiempo"></div>
       </div>
     </div>
+  </div>
+
+  <!-- CAMPAÑAS -->
+  <div id="tab-campanas" class="admin-content hidden">
+    <div class="chart-card" style="max-width:600px;margin-bottom:20px;">
+      <div class="chart-title">Nueva campaña</div>
+      <p style="font-size:.8rem;color:var(--text2);margin-bottom:14px;line-height:1.5;">
+        Publica un aviso informativo (ej. mantenimiento, cierre temporal) o una encuesta
+        (ej. menú de la próxima semana) para que la vean los asociados en la app.
+      </p>
+      <div class="form-field">
+        <label class="form-label" for="cam-tipo">Tipo</label>
+        <select class="form-input" id="cam-tipo">
+          <option value="encuesta">Encuesta (el asociado vota una opción)</option>
+          <option value="aviso">Aviso informativo (sin votación)</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="cam-titulo">Título</label>
+        <input class="form-input" id="cam-titulo" type="text" placeholder="Ej. Menú de la próxima semana" maxlength="120">
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="cam-descripcion">Descripción (opcional)</label>
+        <textarea class="form-input" id="cam-descripcion" placeholder="Contexto adicional para el asociado" style="min-height:60px;"></textarea>
+      </div>
+      <div class="form-field" id="cam-opciones-wrap">
+        <label class="form-label">Opciones de la encuesta</label>
+        <div id="cam-opciones-lista"></div>
+        <button type="button" class="btn-secondary" id="btn-agregar-opcion" style="width:auto;padding:6px 14px;font-size:.78rem;margin-top:4px;">+ Agregar opción</button>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div class="form-field" style="flex:1;min-width:140px;">
+          <label class="form-label" for="cam-inicio">Fecha de inicio</label>
+          <input class="form-input" id="cam-inicio" type="date">
+        </div>
+        <div class="form-field" style="flex:1;min-width:140px;">
+          <label class="form-label" for="cam-fin">Fecha de fin</label>
+          <input class="form-input" id="cam-fin" type="date">
+        </div>
+      </div>
+      <p id="cam-msg" class="form-hint hidden"></p>
+      <button class="btn-primary" id="btn-crear-campana" style="margin-top:6px;">Publicar campaña</button>
+    </div>
+
+    <div id="campanas-lista"></div>
   </div>
 
   <!-- QR DEL COMEDOR -->

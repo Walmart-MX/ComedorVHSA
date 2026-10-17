@@ -5,6 +5,7 @@ import {
   EYE_ICON, CHECK_CIRCLE_ICON, LOCK_ICON, ALERT_TRIANGLE_ICON, CLOCK_ICON
 } from './icons.js';
 import { renderKpiGrid } from './kpi-grid.js';
+import { renderBarChart } from './bar-chart.js';
 
 let cachedReportes = [];
 
@@ -110,21 +111,6 @@ function ultimosDias(lista) {
     valor: conteo[d],
     clase: ''
   }));
-}
-
-function renderBarChart(elementId, items) {
-  const el = document.getElementById(elementId);
-  if (!el) return;
-  const max = Math.max(...items.map(i => i.valor), 1);
-  el.innerHTML = items.map(i => {
-    const porcentaje = Math.round(i.valor / max * 100);
-    return `
-    <div class="bar-row">
-      <div class="bar-label" title="${escapeHtml(i.label)}">${escapeHtml(i.label)}</div>
-      <div class="bar-track" title="${porcentaje}% del máximo"><div class="bar-fill ${i.clase}" style="width:${porcentaje}%"></div></div>
-      <div class="bar-val">${i.valor}</div>
-    </div>`;
-  }).join('');
 }
 
 /** Alerta de tendencia: compara últimos 7 días vs los 7 anteriores por categoría. */

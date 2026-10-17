@@ -5,6 +5,7 @@
 
 import { initAsociado } from './asociado.js';
 import { initConsulta, consultarFolioDesdeURL } from './consulta.js';
+import { initCampanas } from './campanas.js';
 import { isSupabaseConfigured } from './supabase-client.js';
 import { cargarConfiguracion } from './app-config.js';
 import { initPWA } from './pwa.js';
@@ -16,6 +17,7 @@ if (!isSupabaseConfigured) {
 cargarConfiguracion();
 initAsociado();
 initConsulta();
+initCampanas();
 initPWA();
 
 // Deep link desde una notificacion push ligada a un folio (ver service-worker.js):
