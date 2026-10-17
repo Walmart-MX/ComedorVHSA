@@ -18,6 +18,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="../css/styles.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -185,11 +186,23 @@
 
   <!-- QR DEL COMEDOR -->
   <div id="tab-qr" class="admin-content hidden">
-    <div class="chart-card" style="max-width:360px;margin:0 auto;text-align:center;">
-      <div class="chart-title">Cartel para imprimir en el comedor</div>
-      <p style="font-size:.8rem;color:var(--text2);margin-bottom:14px;">Este código apunta siempre a la app pública de reportes, sin importar el dominio donde se hospede.</p>
-      <div id="qr-comedor" style="display:flex;justify-content:center;margin-bottom:14px;"></div>
-      <button onclick="window.print()" class="btn-primary" style="width:auto;padding:10px 20px;">Imprimir cartel</button>
+    <div class="qr-poster" id="qr-poster">
+      <svg class="qr-poster-watermark tl" width="110" height="110" viewBox="0 0 512 512" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"><circle cx="300" cy="256" r="78"/><line x1="182" y1="160" x2="182" y2="356"/><line x1="160" y1="160" x2="160" y2="220"/><line x1="204" y1="160" x2="204" y2="220"/><path d="M160 220 Q160 246 182 246 Q204 246 204 220"/></g></svg>
+      <svg class="qr-poster-watermark br" width="140" height="140" viewBox="0 0 512 512" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"><circle cx="300" cy="256" r="78"/><line x1="182" y1="160" x2="182" y2="356"/><line x1="160" y1="160" x2="160" y2="220"/><line x1="204" y1="160" x2="204" y2="220"/><path d="M160 220 Q160 246 182 246 Q204 246 204 220"/></g></svg>
+      <div class="qr-poster-badge">Escanéame</div>
+      <h3 class="qr-poster-title">Reporta una situación del comedor<br>desde tu celular</h3>
+      <div class="qr-poster-frame">
+        <div id="qr-comedor"></div>
+      </div>
+      <ul class="qr-poster-features">
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Repórtalo en menos de un minuto</li>
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg> Consulta el avance con tu folio</li>
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg> 100% confidencial y anónimo</li>
+      </ul>
+    </div>
+    <p style="font-size:.8rem;color:var(--text2);margin:14px auto 0;max-width:360px;text-align:center;">Este código apunta siempre a la app pública de reportes, sin importar el dominio donde se hospede.</p>
+    <div style="text-align:center;margin-top:14px;">
+      <button type="button" id="btn-descargar-pdf" class="btn-primary" style="width:auto;padding:10px 20px;">Descargar cartel en PDF</button>
     </div>
   </div>
 
@@ -208,6 +221,23 @@
       </div>
       <p id="cfg-whatsapp-msg" class="form-hint hidden"></p>
       <button class="btn-primary" id="btn-guardar-whatsapp" style="margin-top:6px;">Guardar número</button>
+    </div>
+
+    <div class="chart-card" style="max-width:480px;margin-top:20px;">
+      <div class="chart-title">Seguridad de la cuenta</div>
+      <p style="font-size:.8rem;color:var(--text2);margin-bottom:14px;line-height:1.5;">
+        Cambia la contraseña con la que inicias sesión en este panel administrativo.
+      </p>
+      <div class="form-field">
+        <label class="form-label" for="cfg-password-nueva">Nueva contraseña</label>
+        <input class="form-input" id="cfg-password-nueva" type="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="cfg-password-confirmar">Confirmar contraseña</label>
+        <input class="form-input" id="cfg-password-confirmar" type="password" placeholder="Repite la contraseña" autocomplete="new-password">
+      </div>
+      <p id="cfg-password-msg" class="form-hint hidden"></p>
+      <button class="btn-primary" id="btn-cambiar-password" style="margin-top:6px;">Cambiar contraseña</button>
     </div>
   </div>
 

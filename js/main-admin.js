@@ -7,9 +7,10 @@ import { renderDashboard } from './admin-dashboard.js';
 import { initAdminTable, renderTabla, abrirReportePorFolio } from './admin-table.js';
 import { renderTendencias } from './admin-trends.js';
 import { initAdminConfig, renderConfigTab } from './admin-config.js';
+import { initAdminPassword } from './admin-password.js';
 import { cargarConfiguracion } from './app-config.js';
 import { initPWA } from './pwa.js';
-import { renderQR } from './qr.js';
+import { renderQR, initQR } from './qr.js';
 import { activarNotificacionesAdmin, pushDisponible } from './push.js';
 
 if (!isSupabaseConfigured) {
@@ -28,6 +29,8 @@ let folioAdminPendiente = null;
 cargarConfiguracion();
 initAdminTable();
 initAdminConfig();
+initAdminPassword();
+initQR();
 initAuth({ onLogin: onAdminLogin });
 initPWA();
 manejarDeepLink();

@@ -101,34 +101,20 @@ async function wireWhatsapp(r) {
   btn.addEventListener('click', () => compartirPorWhatsapp(r));
 }
 
-/** Intenta adjuntar la FOTO real al compartir (Web Share API, disponible en
-    la mayoría de navegadores móviles): se abre el panel nativo de compartir
-    y el usuario elige WhatsApp ahí. Si el dispositivo no lo soporta, o algo
-    falla al traer la foto, se cae al enlace clásico de WhatsApp (wa.me) con
-    el resumen en texto -- ese SIEMPRE incluye la URL de la foto como un
-    link, así que la foto sigue siendo accesible con un toque aunque no
-    viaje "adjunta" de verdad. */
-async function compartirPorWhatsapp(r) {
+/** Siempre usa el enlace clásico de WhatsApp (wa.me) con el número
+    configurado, igual haya foto o no -- a propósito NO usamos la Web Share
+    API nativa del navegador: esa abre el panel de "compartir" del sistema
+    operativo (no WhatsApp) y, al elegir WhatsApp ahí, la app pide elegir un
+    CONTACTO porque ese panel no tiene forma de indicar un destinatario. El
+    asociado normalmente no conoce el número destino, así que ese selector
+    no sirve de nada. Con wa.me el chat se abre YA en el número correcto.
+    WhatsApp tampoco soporta adjuntar archivos vía enlace (wa.me solo admite
+    texto precargado), así que la foto siempre viaja como un link dentro
+    del resumen -- el asociado solo necesita tocarlo para verla. */
+function compartirPorWhatsapp(r) {
   const destino = getWhatsappDestino();
   if (!destino) return;
   const resumen = construirResumenWhatsapp(r);
-
-  if (r.foto_url && navigator.share && navigator.canShare) {
-    try {
-      const respuesta = await fetch(r.foto_url);
-      const blob = await respuesta.blob();
-      const archivo = new File([blob], 'evidencia-comedor.jpg', { type: blob.type || 'image/jpeg' });
-      if (navigator.canShare({ files: [archivo] })) {
-        await navigator.share({ files: [archivo], text: resumen, title: 'Reporte del comedor' });
-        return;
-      }
-    } catch (err) {
-      // Fetch/permiso/cancelado: no es un error fatal, solo significa que
-      // usamos el enlace de WhatsApp de abajo en vez del share nativo.
-      console.error('No se pudo compartir la foto directamente, se usará WhatsApp con el enlace en el texto:', err);
-    }
-  }
-
   window.open(`https://wa.me/${destino}?text=${encodeURIComponent(resumen)}`, '_blank', 'noopener');
 }
 

@@ -416,6 +416,38 @@ tr:hover td{background:#f7f9fc;}
   border-radius:10px;font-weight:800;font-size:.9rem;cursor:pointer;
 }
 
+/* ═══════════════════════════════════════════
+   CARTEL DEL QR -- pensado para que un asociado que pasa caminando se
+   detenga a verlo, no solo un código pelón sobre fondo blanco. Usa los
+   mismos tokens de marca (--blue-dark/--yellow) que el resto del panel,
+   nada de colores nuevos inventados para esta sola pantalla.
+═══════════════════════════════════════════ */
+.qr-poster{
+  max-width:380px;margin:0 auto;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,var(--blue-dark) 0%,var(--blue) 100%);
+  border-radius:var(--radius);padding:28px 22px 24px;text-align:center;
+  box-shadow:var(--shadow-lg);color:white;
+}
+.qr-poster-watermark{
+  position:absolute;opacity:.12;pointer-events:none;color:white;
+}
+.qr-poster-watermark.tl{top:-14px;left:-14px;transform:rotate(-12deg);}
+.qr-poster-watermark.br{bottom:-14px;right:-14px;transform:rotate(8deg);}
+.qr-poster-badge{
+  display:inline-block;background:var(--yellow);color:var(--blue-dark);
+  font-size:.7rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+  padding:4px 14px;border-radius:20px;margin-bottom:12px;
+}
+.qr-poster-title{font-size:1.05rem;font-weight:800;line-height:1.35;margin-bottom:18px;}
+.qr-poster-frame{
+  background:white;border-radius:var(--radius-sm);padding:16px;
+  display:inline-flex;justify-content:center;position:relative;
+  border:3px dashed var(--yellow);
+}
+.qr-poster-features{list-style:none;margin-top:18px;display:flex;flex-direction:column;gap:9px;text-align:left;}
+.qr-poster-features li{display:flex;align-items:center;gap:10px;font-size:.78rem;font-weight:700;}
+.qr-poster-features svg{flex-shrink:0;color:var(--yellow);}
+
 /* Responsive admin */
 @media(max-width:680px){
   .charts-grid{grid-template-columns:1fr;}

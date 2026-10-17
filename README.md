@@ -33,10 +33,11 @@ flujo. No existe un modo "con mis datos": todo reporte es anónimo, siempre.
 En la pantalla de confirmación, de forma completamente opcional, se puede:
 
 - **Compartir por WhatsApp**: un resumen con emojis (folio, categoría,
-  comedor, fecha) al número configurado en el panel admin. Si el reporte
-  trae foto, se intenta adjuntarla de verdad usando el panel nativo de
-  compartir del navegador (Web Share API); si el dispositivo no lo soporta,
-  el mensaje de WhatsApp igual incluye el link directo a la foto.
+  comedor, fecha) al número configurado en el panel admin, abierto siempre
+  vía `wa.me` directo a ese número -- sin pasar por el selector de
+  contactos del sistema. Si el reporte trae foto, su URL viaja como un
+  link dentro del mismo mensaje de texto (WhatsApp no soporta adjuntar
+  archivos reales vía enlace, solo texto precargado).
 - **Activar notificaciones** de cambios de estatus, ligadas solo al folio
   (`push_subscriptions`, tipo `reporte`), nunca a una persona.
 - [x] Esquema de base de datos (`supabase/migrations/`) -- confirmado en
